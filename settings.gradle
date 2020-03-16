@@ -1,2 +1,3 @@
 rootProject.name='Firebase Auth REST API'
 include ':app'
+include ':firebase-auth-rest:core'
