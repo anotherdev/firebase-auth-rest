@@ -29,6 +29,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation project(':firebase-auth-rest:core')
+
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
 
     testImplementation "junit:junit:$junitVersion"
