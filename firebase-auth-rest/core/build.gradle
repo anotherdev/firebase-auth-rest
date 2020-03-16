@@ -29,6 +29,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation 'com.google.firebase:firebase-common:19.3.0'
+    implementation 'com.google.firebase:firebase-auth-interop:19.0.0'
+
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxTestJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxTestEspressoVersion"
