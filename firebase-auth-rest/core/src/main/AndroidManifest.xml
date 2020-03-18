@@ -8,6 +8,12 @@
             android:name="com.anotherdev.firebase.auth.init.InternalFirebaseAuthRestInitProvider"
             android:initOrder="10000"
             android:exported="false" />
+        
+        <service android:name="com.google.firebase.components.ComponentDiscoveryService">
+            <meta-data
+                android:name="com.anotherdev.firebase.auth.rest.RestAuthComponentRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
+        </service>
 
     </application>
 
