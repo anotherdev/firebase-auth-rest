@@ -29,6 +29,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0"
+
     implementation "com.google.code.gson:gson:$gsonVersion"
 
     implementation "com.google.firebase:firebase-common:19.3.0"
@@ -41,6 +43,8 @@ dependencies {
 
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+
+    implementation "io.reactivex.rxjava3:rxjava:$rxJava3Version"
 
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxTestJunitVersion"
