@@ -29,10 +29,18 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation "com.google.code.gson:gson:$gsonVersion"
+
     implementation "com.google.firebase:firebase-common:19.3.0"
     implementation "com.google.firebase:firebase-auth-interop:19.0.0"
 
     implementation "com.jakewharton.timber:timber:$timberVersion"
+
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+    implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
 
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxTestJunitVersion"
