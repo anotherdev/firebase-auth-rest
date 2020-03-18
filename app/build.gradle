@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -32,6 +33,9 @@ dependencies {
     implementation project(':firebase-auth-rest:core')
 
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+
+    //implementation "com.google.firebase:firebase-analytics:17.2.3"
+    implementation "com.google.firebase:firebase-auth:19.3.0"
 
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxTestJunitVersion"
