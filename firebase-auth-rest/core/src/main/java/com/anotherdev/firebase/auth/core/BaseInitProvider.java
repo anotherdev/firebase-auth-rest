@@ -2,13 +2,23 @@ package com.anotherdev.firebase.auth.core;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.firebase.components.Preconditions;
+
 public class BaseInitProvider extends ContentProvider {
+
+    @NonNull
+    protected Context getAppContext() {
+        Context appContext = getContext();
+        Preconditions.checkNotNull(appContext);
+        return appContext;
+    }
 
     @Override
     public boolean onCreate() {
