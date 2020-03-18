@@ -1,2 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.anotherdev.firebase.auth.core" />
+    package="com.anotherdev.firebase.auth.core">
+
+    <application>
+
+        <provider
+            android:authorities="${applicationId}.anotherdev.firebase.auth.init.provider"
+            android:name="com.anotherdev.firebase.auth.init.InternalFirebaseAuthRestInitProvider"
+            android:initOrder="10000"
+            android:exported="false" />
+
+    </application>
+
+</manifest>
