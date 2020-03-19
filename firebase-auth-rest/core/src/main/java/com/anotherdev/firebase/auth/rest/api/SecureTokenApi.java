@@ -2,5 +2,6 @@ package com.anotherdev.firebase.auth.rest.api;
 
 public interface SecureTokenApi {
 
-    String BASE_URL = "https://securetoken.googleapis.com//v1/";
+    // Workaround colon issue. https://github.com/square/retrofit/issues/3080
+    String BASE_URL = "https://securetoken.googleapis.com/";
 }
