@@ -20,8 +20,8 @@ public final class RestAuthApi {
 
     private RestAuthApi() {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new RestAuthInterceptor(AppContext.get()))
                 .addInterceptor(new HttpLoggingInterceptor().setLevel(DEBUG ? BODY : BASIC))
+                .addInterceptor(new RestAuthInterceptor(AppContext.get()))
                 .build();
 
         auth = buildApi(okHttpClient, IdentityToolkitApi.BASE_URL, IdentityToolkitApi.class);
