@@ -11,4 +11,6 @@ public interface FirebaseAuth extends InternalAuthProvider {
     FirebaseUser getCurrentUser();
 
     Single<SignInAnonymouslyResponse> signInAnonymously();
+
+    void signOut();
 }

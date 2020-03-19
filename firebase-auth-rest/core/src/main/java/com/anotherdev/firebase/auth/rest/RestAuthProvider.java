@@ -49,6 +49,11 @@ public class RestAuthProvider implements FirebaseAuth {
                 .map(saveAnonymousUser);
     }
 
+    @Override
+    public void signOut() {
+        user.delete();
+    }
+
     @NonNull
     @Override
     public Task<GetTokenResult> getAccessToken(boolean forceRefresh) {
@@ -73,6 +78,7 @@ public class RestAuthProvider implements FirebaseAuth {
     public void removeIdTokenListener(@NonNull IdTokenListener idTokenListener) {
         listeners.remove(idTokenListener);
     }
+
 
     private void saveCurrentUser(String idToken, String refreshToken) {
         user.set(FirebaseUser.from(idToken, refreshToken));
