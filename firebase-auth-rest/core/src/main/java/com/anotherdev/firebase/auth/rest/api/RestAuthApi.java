@@ -47,7 +47,7 @@ public final class RestAuthApi {
         return RestAuthApiHolder.INSTANCE.auth;
     }
 
-    private static SecureTokenApi token() {
+    public static SecureTokenApi token() {
         return RestAuthApiHolder.INSTANCE.token;
     }
 }
