@@ -23,7 +23,9 @@ public class InternalFirebaseAuthRestInitProvider extends BaseInitProvider {
             final String googleApiKey = appContext.getString(R.string.google_api_key);
             Timber.i("google_api_key: %s", googleApiKey);
 
-            Data.from(appContext).getApiKey().set(googleApiKey);
+            Data.from(appContext)
+                    .getApiKey()
+                    .set(googleApiKey);
             return true;
         } catch (Exception e) {
             Log.e(InternalFirebaseAuthRestInitProvider.class.getSimpleName(), e.getMessage(), e);
