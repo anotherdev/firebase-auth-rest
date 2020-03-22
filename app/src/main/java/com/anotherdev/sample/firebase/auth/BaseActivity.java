@@ -3,6 +3,7 @@ package com.anotherdev.sample.firebase.auth;
 import android.os.Bundle;
 import android.view.WindowManager;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,12 +14,20 @@ import com.anotherdev.sample.firebase.auth.intent.LoginIntent;
 import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;
 import com.google.firebase.FirebaseApp;
 
-import io.reactivex.disposables.CompositeDisposable;
+import butterknife.ButterKnife;
+import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
 import io.reactivex.internal.functions.Functions;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    private final CompositeDisposable onDestroyV2 = new CompositeDisposable();
+    protected final CompositeDisposable onDestroy = new CompositeDisposable();
+
+
+    @LayoutRes
+    protected int getActivityLayoutRes() {
+        return 0;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,6 +35,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (BuildConfig.DEBUG) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
+        setContentView();
+    }
+
+    private void setContentView() {
+        if (isLayoutProvided()) {
+            setContentView(getActivityLayoutRes());
+            ButterKnife.bind(this);
+        }
+    }
+
+    protected boolean isLayoutProvided() {
+        return getActivityLayoutRes() != 0;
     }
 
     protected void requestAuthIfNeeded() {
@@ -34,15 +55,16 @@ public abstract class BaseActivity extends AppCompatActivity {
         FirebaseUser currentUser = auth.getCurrentUser();
 
         if (currentUser == null) {
-            onDestroyV2.add(new RxInlineActivityResult(this)
-                    .request(new LoginIntent(this))
-                    .subscribe(Functions.emptyConsumer(), Rx2Util.ON_ERROR_LOG));
+            onDestroy.add(RxJavaBridge
+                    .toV3Disposable(new RxInlineActivityResult(this)
+                            .request(new LoginIntent(this))
+                            .subscribe(Functions.emptyConsumer(), Rx2Util.ON_ERROR_LOG)));
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        onDestroyV2.clear();
+        onDestroy.clear();
     }
 }

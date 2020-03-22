@@ -4,18 +4,20 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
-import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyResponse;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
-
-import io.reactivex.rxjava3.functions.Consumer;
 
 public class MainActivity extends BaseActivity {
 
     @Override
+    protected int getActivityLayoutRes() {
+        return R.layout.activity_main;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        requestAuthIfNeeded();
 
         FirebaseApp app = FirebaseApp.getInstance();
         Log.e(getClass().getSimpleName(), String.valueOf(app));
@@ -26,7 +28,7 @@ public class MainActivity extends BaseActivity {
         Log.e("FAR", "auth.getUid(): " + auth.getUid());
         Log.e("FAR", "user: " + user);
 
-        if (user == null) {
+        /*if (user == null) {
             auth.signInAnonymously()
                     .doOnError(new Consumer<Throwable>() {
                         @Override
@@ -44,7 +46,7 @@ public class MainActivity extends BaseActivity {
                     .subscribe();
         } else {
             Log.e("FAR", "Already signed in: " + user);
-        }
+        }*/
 
         FirebaseDatabase.getInstance()
                 .getReference("test")

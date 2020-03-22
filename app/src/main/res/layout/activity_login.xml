@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="8dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/auth_sign_in_anonymously_button"
+            android:text="Sign In Anonymously"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="@android:dimen/app_icon_size" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/auth_logout_button"
+            android:text="Log Out"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="@android:dimen/app_icon_size" />
+
+    </LinearLayout>
+
+</RelativeLayout>
