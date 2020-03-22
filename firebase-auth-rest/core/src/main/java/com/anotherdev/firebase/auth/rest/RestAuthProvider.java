@@ -20,6 +20,8 @@ import com.google.firebase.internal.InternalTokenResult;
 import java.util.ArrayList;
 import java.util.List;
 
+import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Function;
 import timber.log.Timber;
@@ -43,6 +45,12 @@ public class RestAuthProvider implements FirebaseAuth {
     @Override
     public FirebaseUser getCurrentUser() {
         return user.isSet() ? user.get() : null;
+    }
+
+    @Override
+    public Observable<FirebaseAuth> authStateChanges() {
+        return RxJavaBridge.toV3Observable(user.asObservable())
+                .map(firebaseUser -> RestAuthProvider.this);
     }
 
     @Override
