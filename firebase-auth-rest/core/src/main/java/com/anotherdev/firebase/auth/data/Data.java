@@ -28,10 +28,10 @@ public class Data {
         return rxSharedPreferences.getString("google_api_key", "");
     }
 
-    public Preference<FirebaseUser> getCurrentUser() {
+    public Preference<FirebaseUser> getCurrentUser(@NonNull FirebaseUser defaultValue) {
         return rxSharedPreferences.getObject(
                 "current_user_info",
-                FirebaseUser.SIGNED_OUT,
+                defaultValue,
                 new Preference.Converter<FirebaseUser>() {
                     @NonNull
                     @Override

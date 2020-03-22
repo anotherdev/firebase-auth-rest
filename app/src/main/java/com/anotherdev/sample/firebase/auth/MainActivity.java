@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
-import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyResponse;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
@@ -27,7 +26,7 @@ public class MainActivity extends BaseActivity {
         Log.e("FAR", "auth.getUid(): " + auth.getUid());
         Log.e("FAR", "user: " + user);
 
-        if (FirebaseUser.SIGNED_OUT.equals(user)) {
+        if (user == null) {
             auth.signInAnonymously()
                     .doOnError(new Consumer<Throwable>() {
                         @Override

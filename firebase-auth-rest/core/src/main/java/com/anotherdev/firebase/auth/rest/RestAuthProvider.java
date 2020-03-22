@@ -26,6 +26,8 @@ import timber.log.Timber;
 
 public class RestAuthProvider implements FirebaseAuth {
 
+    private static final FirebaseUser SIGNED_OUT = FirebaseUser.from(null, null);
+
     private final FirebaseApp app;
     private final Preference<FirebaseUser> user;
 
@@ -34,12 +36,13 @@ public class RestAuthProvider implements FirebaseAuth {
 
     public RestAuthProvider(FirebaseApp app) {
         this.app = app;
-        user = Data.from(app.getApplicationContext()).getCurrentUser();
+        user = Data.from(app.getApplicationContext()).getCurrentUser(SIGNED_OUT);
     }
 
+    @Nullable
     @Override
     public FirebaseUser getCurrentUser() {
-        return user.get();
+        return user.isSet() ? user.get() : null;
     }
 
     @Override

@@ -8,8 +8,6 @@ import com.google.gson.JsonObject;
 
 public class FirebaseUser {
 
-    public static final FirebaseUser SIGNED_OUT = FirebaseUser.from(null, null);
-
     String idToken;
     String refreshToken;
     JsonObject userInfo;
