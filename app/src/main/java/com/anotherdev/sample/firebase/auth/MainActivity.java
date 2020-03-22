@@ -2,7 +2,6 @@ package com.anotherdev.sample.firebase.auth;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.WindowManager;
 
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
@@ -17,9 +16,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (BuildConfig.DEBUG) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        }
         setContentView(R.layout.activity_main);
 
         FirebaseApp app = FirebaseApp.getInstance();
