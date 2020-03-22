@@ -2,6 +2,7 @@ package com.anotherdev.firebase.auth.util;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.common.util.Base64Utils;
@@ -15,6 +16,7 @@ public class IdTokenParser {
     private static final Gson GSON = FarGson.get();
 
 
+    @NonNull
     public static JsonObject parseIdToken(@Nullable String idToken) {
         if (TextUtils.isEmpty(idToken)) {
             return new JsonObject();
@@ -30,7 +32,8 @@ public class IdTokenParser {
                 Base64Utils.decodeUrlSafeNoPadding(encodedToken),
                 Charset.defaultCharset()
         );
-        return GSON.fromJson(decodedToken, JsonObject.class);
+        JsonObject json = GSON.fromJson(decodedToken, JsonObject.class);
+        return json != null ? json : new JsonObject();
     }
 
     private IdTokenParser() { /* Util */ }
