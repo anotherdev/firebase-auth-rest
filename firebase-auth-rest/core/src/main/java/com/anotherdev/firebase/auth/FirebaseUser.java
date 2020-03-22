@@ -3,6 +3,7 @@ package com.anotherdev.firebase.auth;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.util.IdTokenParser;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class FirebaseUser {
@@ -32,7 +33,8 @@ public class FirebaseUser {
 
     @Nullable
     public String getUid() {
-        return userInfo.get("user_id").getAsString();
+        JsonElement uid = userInfo.get("user_id");
+        return uid != null ? uid.getAsString() : null;
     }
 
     public static FirebaseUser from(String idToken, String refreshToken) {
