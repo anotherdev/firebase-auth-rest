@@ -9,12 +9,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+
+        <activity-alias
+            android:name="com.anotherdev.sample.firebase.auth.Home"
+            android:targetActivity="com.anotherdev.sample.firebase.auth.StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity-alias>
+
+        <activity android:name="com.anotherdev.sample.firebase.auth.StartActivity" />
+
+        <activity android:name="com.anotherdev.sample.firebase.auth.LoginActivity" />
+
+        <activity android:name="com.anotherdev.sample.firebase.auth.MainActivity" />
+
     </application>
 
 </manifest>
