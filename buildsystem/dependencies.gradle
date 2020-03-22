@@ -32,6 +32,7 @@ ext {
     okhttpVersion = '4.4.1'
     retrofitVersion = '2.7.2'
     rxJava3Version = '3.0.1'
+    rxJavaBridgeVersion = '3.0.0'
     timberVersion = '4.7.1'
 
     junitVersion = '4.12'

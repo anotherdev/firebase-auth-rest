@@ -30,11 +30,17 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    //implementation "com.github.anotherdev:firebase-auth-rest:0.0.1"
     implementation project(':firebase-auth-rest:core')
+
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+
+    implementation "com.github.akarnokd:rxjava3-bridge:$rxJavaBridgeVersion"
 
     implementation "com.github.florent37:inline-activity-result-rx:1.0.3"
 
-    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation 'com.jakewharton:butterknife:10.2.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
 
     //implementation "com.google.firebase:firebase-analytics:17.2.3"
     implementation "com.google.firebase:firebase-auth:19.3.0"
