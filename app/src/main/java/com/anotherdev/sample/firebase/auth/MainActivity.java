@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyResponse;
@@ -14,7 +12,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import io.reactivex.rxjava3.functions.Consumer;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
