@@ -29,6 +29,7 @@ ext {
     androidxCoreKtxVersion = '1.2.0'
     androidxLifecycleVersion = '2.2.0'
     gsonVersion = '2.8.6'
+    immutablesVersion = '2.8.2'
     okhttpVersion = '4.4.1'
     retrofitVersion = '2.7.2'
     rxJava3Version = '3.0.1'

@@ -50,6 +50,10 @@ dependencies {
 
     api "io.reactivex.rxjava3:rxjava:$rxJava3Version"
 
+    compileOnly "org.immutables:gson:$immutablesVersion"
+    annotationProcessor "org.immutables:value:$immutablesVersion"
+    compileOnly "org.immutables:value:$immutablesVersion"
+
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxTestJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxTestEspressoVersion"
