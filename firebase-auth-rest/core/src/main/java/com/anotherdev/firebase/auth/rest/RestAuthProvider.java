@@ -13,6 +13,8 @@ import com.f2prateek.rx.preferences2.Preference;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.internal.IdTokenListener;
 import com.google.firebase.internal.InternalTokenResult;
@@ -24,6 +26,7 @@ import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Function;
+import kotlin.NotImplementedError;
 import timber.log.Timber;
 
 public class RestAuthProvider implements FirebaseAuth {
@@ -63,6 +66,11 @@ public class RestAuthProvider implements FirebaseAuth {
         return RestAuthApi.auth()
                 .signInAnonymously(new SignInAnonymouslyRequest())
                 .map(saveAnonymousUser);
+    }
+
+    @Override
+    public Single<AuthResult> signInWithCredential(AuthCredential credential) {
+        return Single.error(new NotImplementedError());
     }
 
     @Override
