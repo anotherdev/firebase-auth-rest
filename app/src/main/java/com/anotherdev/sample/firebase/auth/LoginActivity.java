@@ -33,6 +33,7 @@ public class LoginActivity extends BaseActivity {
 
         setupSignInAnonymouslyButton(firebaseAuth);
         setupLogoutButton(firebaseAuth);
+        setResult(RESULT_OK);
     }
 
     private void setupSignInAnonymouslyButton(FirebaseAuth firebaseAuth) {
