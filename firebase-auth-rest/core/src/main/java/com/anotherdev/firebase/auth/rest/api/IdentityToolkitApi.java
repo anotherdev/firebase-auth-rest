@@ -1,7 +1,9 @@
 package com.anotherdev.firebase.auth.rest.api;
 
+import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyResponse;
+import com.google.gson.JsonObject;
 
 import io.reactivex.rxjava3.core.Single;
 import retrofit2.http.Body;
@@ -15,4 +17,7 @@ public interface IdentityToolkitApi {
 
     @POST("v1/accounts:signUp")
     Single<SignInAnonymouslyResponse> signInAnonymously(@Body SignInAnonymouslyRequest request);
+
+    @POST("v1/accounts:lookup")
+    Single<JsonObject> getAccounts(@Body IdTokenRequest request);
 }

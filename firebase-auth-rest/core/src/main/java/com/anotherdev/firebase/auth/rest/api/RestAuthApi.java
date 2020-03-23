@@ -1,6 +1,7 @@
 package com.anotherdev.firebase.auth.rest.api;
 
 import com.anotherdev.firebase.auth.init.AppContext;
+import com.anotherdev.firebase.auth.util.FarGson;
 
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import okhttp3.OkHttpClient;
@@ -33,7 +34,7 @@ public final class RestAuthApi {
                 .baseUrl(url)
                 .client(client)
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.createAsync())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(FarGson.get()))
                 .build()
                 .create(apiClass);
     }
