@@ -58,7 +58,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             onDestroy.add(RxJavaBridge
                     .toV3Disposable(new RxInlineActivityResult(this)
                             .request(new LoginIntent(this))
-                            .subscribe(Functions.emptyConsumer(), Rx2Util.ON_ERROR_LOG)));
+                            .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2)));
         }
     }
 
