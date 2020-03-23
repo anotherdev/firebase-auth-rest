@@ -35,6 +35,11 @@ public class FirebaseUser {
         return uid != null ? uid.getAsString() : null;
     }
 
+    public long getExpirationTime() {
+        JsonElement exp = userInfo.get("exp");
+        return exp != null ? exp.getAsLong() : 0;
+    }
+
     public static FirebaseUser from(String idToken, String refreshToken) {
         return new FirebaseUser(idToken, refreshToken);
     }
