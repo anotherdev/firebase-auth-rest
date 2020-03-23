@@ -40,6 +40,14 @@ public class FirebaseUser {
         return exp != null ? exp.getAsLong() : 0;
     }
 
+    boolean isExpired() {
+        return expiresInSeconds() <= 0;
+    }
+
+    long expiresInSeconds() {
+        return getExpirationTime() - (System.currentTimeMillis() / 1000);
+    }
+
     public static FirebaseUser from(String idToken, String refreshToken) {
         return new FirebaseUser(idToken, refreshToken);
     }
