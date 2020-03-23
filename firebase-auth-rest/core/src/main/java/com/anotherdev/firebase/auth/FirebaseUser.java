@@ -40,7 +40,7 @@ public class FirebaseUser {
         return exp != null ? exp.getAsLong() : 0;
     }
 
-    boolean isExpired() {
+    public boolean isExpired() {
         return expiresInSeconds() <= 0;
     }
 
