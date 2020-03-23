@@ -3,7 +3,10 @@ package com.anotherdev.firebase.auth;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.OnLifecycleEvent;
 
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -35,7 +38,40 @@ public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserve
 
     @Override
     public void onIdTokenChanged(@NonNull InternalTokenResult result) {
+        final String newToken = result.getToken();
+        if (newToken != null && lastToken == null) {
+            // We are now signed in, time to start refreshing
+            Timber.d("Token changed from null --> non-null, starting refreshing");
+            handler.post(refreshRunnable);
+        }
+
+        if (newToken == null && lastToken != null) {
+            // The user signed out, stop all refreshing
+            Timber.d("Signed out, canceling refreshes.");
+            handler.removeCallbacksAndMessages(null);
+        }
+
+        lastToken = newToken;
     }
+
+    public void bindTo(LifecycleOwner owner) {
+        owner.getLifecycle().addObserver(this);
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    public void onLifecycleStarted() {
+        auth.addIdTokenListener(this);
+        handler.post(refreshRunnable);
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public void onLifecycleStopped() {
+        Timber.d("onLifecycleStopped()");
+        this.auth.removeIdTokenListener(this);
+        this.handler.removeCallbacksAndMessages(null);
+        this.lastToken = null;
+    }
+
 
     private final Runnable refreshRunnable = new Runnable() {
         @Override
