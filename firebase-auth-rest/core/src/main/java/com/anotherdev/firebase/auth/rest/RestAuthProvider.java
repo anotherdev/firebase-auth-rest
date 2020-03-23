@@ -7,8 +7,11 @@ import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
+import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyResponse;
+import com.anotherdev.firebase.auth.util.IdTokenParser;
+import com.anotherdev.firebase.auth.util.RxUtil;
 import com.f2prateek.rx.preferences2.Preference;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -18,14 +21,17 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.internal.IdTokenListener;
 import com.google.firebase.internal.InternalTokenResult;
+import com.google.firebase.internal.api.FirebaseNoSignedInUserException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.internal.functions.Functions;
 import kotlin.NotImplementedError;
 import timber.log.Timber;
 
@@ -78,12 +84,39 @@ public class RestAuthProvider implements FirebaseAuth {
         user.delete();
     }
 
+    private GetTokenResult getTokenResultLocal(@NonNull FirebaseUser user) {
+        String idToken = user.getIdToken();
+        Map<String, Object> map = IdTokenParser.parseIdTokenToMap(idToken);
+        return new GetTokenResult(idToken, map);
+    }
+
     @NonNull
     @Override
     public Task<GetTokenResult> getAccessToken(boolean forceRefresh) {
-        Timber.e("getAccessToken() called");
+        Timber.d("getAccessToken(%s)", forceRefresh);
         TaskCompletionSource<GetTokenResult> source = new TaskCompletionSource<>();
-        source.trySetException(new UnsupportedOperationException("Not implemented yet"));
+        FirebaseUser user = getCurrentUser();
+        if (user != null) {
+            boolean needRefresh = forceRefresh || user.isExpired();
+            if (!needRefresh) {
+                source.trySetResult(getTokenResultLocal(user));
+            } else {
+                ExchangeTokenRequest request = ExchangeTokenRequest.builder()
+                        .refreshToken(user.getRefreshToken())
+                        .build();
+                RestAuthApi.token()
+                        .exchangeToken(request)
+                        .map(response -> {
+                            saveCurrentUser(response.getIdToken(), response.getRefreshToken());
+                            return response;
+                        })
+                        .doOnSuccess(response -> source.trySetResult(getTokenResultLocal(user)))
+                        .doOnError(e -> source.trySetException(new Exception(e)))
+                        .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
+            }
+        } else {
+            source.trySetException(new FirebaseNoSignedInUserException("Please sign in before trying to get a token."));
+        }
         return source.getTask();
     }
 
