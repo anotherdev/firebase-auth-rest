@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Firebase Auth REST API</string>
+
+    <string name="accounts">Accounts</string>
+
+    <string name="sign_in_anonymously">Sign In Anonymously</string>
+    <string name="log_out">Log Out</string>
 </resources>

@@ -14,14 +14,14 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/auth_sign_in_anonymously_button"
-            android:text="Sign In Anonymously"
+            android:text="@string/sign_in_anonymously"
             android:layout_margin="8dp"
             android:layout_width="match_parent"
             android:layout_height="@android:dimen/app_icon_size" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/auth_logout_button"
-            android:text="Log Out"
+            android:text="@string/log_out"
             android:layout_margin="8dp"
             android:layout_width="match_parent"
             android:layout_height="@android:dimen/app_icon_size" />
