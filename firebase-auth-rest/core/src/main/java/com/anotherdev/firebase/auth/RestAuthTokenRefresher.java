@@ -21,7 +21,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserver {
 
-    private static final long REFRESH_PERIOD = MILLISECONDS.convert(10, SECONDS);
+    private static final long REFRESH_PERIOD = MILLISECONDS.convert(10, MINUTES);
     private static final long MIN_RETRY_BACKOFF = MILLISECONDS.convert(30, SECONDS);
     private static final long MAX_RETRY_BACKOFF = MILLISECONDS.convert(5, MINUTES);
 
