@@ -19,7 +19,8 @@
             </intent-filter>
         </activity-alias>
 
-        <activity android:name="com.anotherdev.sample.firebase.auth.LoginActivity" />
+        <activity android:name="com.anotherdev.sample.firebase.auth.LoginActivity"
+            android:parentActivityName="com.anotherdev.sample.firebase.auth.MainActivity"/>
 
         <activity android:name="com.anotherdev.sample.firebase.auth.MainActivity" />
 
