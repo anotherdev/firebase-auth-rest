@@ -21,12 +21,14 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserver {
 
-    private static final long REFRESH_PERIOD = MILLISECONDS.convert(10, MINUTES);
+    private static final long REFRESH_PERIOD = MILLISECONDS.convert(10, SECONDS);
     private static final long MIN_RETRY_BACKOFF = MILLISECONDS.convert(30, SECONDS);
     private static final long MAX_RETRY_BACKOFF = MILLISECONDS.convert(5, MINUTES);
 
     private final Handler handler = new Handler();
     private final FirebaseAuth auth;
+
+    private String ownerName;
 
     private long failureRetryTimeMillis = MIN_RETRY_BACKOFF;
     private String lastToken;
@@ -56,17 +58,19 @@ public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserve
 
     public void bindTo(LifecycleOwner owner) {
         owner.getLifecycle().addObserver(this);
+        ownerName = owner.toString();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void onLifecycleStarted() {
+        Timber.d("onLifecycleStarted(): %s", ownerName);
         auth.addIdTokenListener(this);
         handler.post(refreshRunnable);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void onLifecycleStopped() {
-        Timber.d("onLifecycleStopped()");
+        Timber.d("onLifecycleStopped(): %s", ownerName);
         this.auth.removeIdTokenListener(this);
         this.handler.removeCallbacksAndMessages(null);
         this.lastToken = null;
