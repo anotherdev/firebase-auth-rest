@@ -3,6 +3,7 @@ package com.anotherdev.sample.firebase.auth;
 import android.os.Bundle;
 import android.view.WindowManager;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,7 +39,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView();
     }
 
-    private void setContentView() {
+    @CallSuper
+    protected void setContentView() {
         if (isLayoutProvided()) {
             setContentView(getActivityLayoutRes());
             ButterKnife.bind(this);
