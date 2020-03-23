@@ -13,6 +13,7 @@ import com.google.firebase.FirebaseApp;
 
 import butterknife.BindView;
 import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.internal.functions.Functions;
 
 public class LoginActivity extends BaseActivity {
 
@@ -30,7 +31,19 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         FirebaseAuth firebaseAuth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
 
+        setupSignInAnonymouslyButton(firebaseAuth);
         setupLogoutButton(firebaseAuth);
+    }
+
+    private void setupSignInAnonymouslyButton(FirebaseAuth firebaseAuth) {
+        setupButton(firebaseAuth,
+                signInAnonymouslyButton,
+                v -> {
+                    v.setEnabled(false);
+                    onDestroy.add(firebaseAuth.signInAnonymously()
+                            .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
+                },
+                auth -> signInAnonymouslyButton.setEnabled(!auth.isSignedIn()));
     }
 
     private void setupLogoutButton(FirebaseAuth firebaseAuth) {
@@ -48,4 +61,12 @@ public class LoginActivity extends BaseActivity {
         onDestroy.add(firebaseAuth.authStateChanges()
                 .subscribe(authStateConsumer, RxUtil.ON_ERROR_LOG_V3));
     }
+
+
+    private final Consumer<?> ON_NEXT_FINISH = new Consumer<Object>() {
+        @Override
+        public void accept(Object o) throws Throwable {
+            finish();
+        }
+    };
 }
