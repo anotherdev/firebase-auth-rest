@@ -10,6 +10,7 @@ import org.immutables.value.Value;
 @Gson.TypeAdapters
 public interface ExchangeTokenRequest {
 
+    @Value.Default
     @SerializedName("grant_type")
     default String getGrantType() {
         return "refresh_token";
