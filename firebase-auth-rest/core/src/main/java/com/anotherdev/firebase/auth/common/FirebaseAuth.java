@@ -15,6 +15,8 @@ public interface FirebaseAuth extends InternalAuthProvider {
     @Nullable
     FirebaseUser getCurrentUser();
 
+    boolean isSignedIn();
+
     @CheckReturnValue
     Observable<FirebaseAuth> authStateChanges();
 

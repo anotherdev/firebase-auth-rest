@@ -48,6 +48,11 @@ public class RestAuthProvider implements FirebaseAuth {
     }
 
     @Override
+    public boolean isSignedIn() {
+        return user.isSet();
+    }
+
+    @Override
     public Observable<FirebaseAuth> authStateChanges() {
         return RxJavaBridge.toV3Observable(user.asObservable())
                 .map(firebaseUser -> RestAuthProvider.this);
