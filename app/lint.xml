@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+
+    <issue id="MissingTranslation">
+        <ignore path="**/res/values/api_keys.xml" />
+    </issue>
+
+    <issue id="HardcodedText" severity="fatal" />
+
+</lint>
