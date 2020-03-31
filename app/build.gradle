@@ -35,6 +35,8 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
 
+    implementation 'com.facebook.android:facebook-login:6.3.0'
+
     implementation "com.github.akarnokd:rxjava3-bridge:$rxJavaBridgeVersion"
 
     implementation "com.github.florent37:inline-activity-result-rx:1.0.3"
