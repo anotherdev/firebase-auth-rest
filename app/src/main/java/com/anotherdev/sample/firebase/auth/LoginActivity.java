@@ -14,6 +14,7 @@ import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
+import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -21,9 +22,14 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.FirebaseApp;
 
 import butterknife.BindView;
+import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.internal.functions.Functions;
@@ -33,9 +39,11 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.auth_sign_in_anonymously_button) Button signInAnonymouslyButton;
     @BindView(R.id.auth_facebook_button) LoginButton facebookLoginButton;
     @BindView(R.id.auth_sign_in_with_facebook_button) Button signInWithFacebookButton;
+    @BindView(R.id.auth_sign_in_with_google_button) Button signInWithGoogleButton;
     @BindView(R.id.auth_logout_button) Button logoutButton;
 
     private final CallbackManager facebookCallbackManager = CallbackManager.Factory.create();
+    private GoogleSignInClient googleSignInClient;
 
 
     @Override
@@ -52,6 +60,12 @@ public class LoginActivity extends BaseActivity {
         }
 
         setResult(RESULT_OK);
+
+        googleSignInClient = GoogleSignIn.getClient(this,
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(getString(R.string.default_web_client_id))
+                        .requestEmail()
+                        .build());
     }
 
     @Override
@@ -60,6 +74,7 @@ public class LoginActivity extends BaseActivity {
         FirebaseAuth firebaseAuth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
         setupSignInAnonymouslyButton(firebaseAuth);
         setupSignInWithFacebookButton(firebaseAuth);
+        setupSignInWithGoogleButton(firebaseAuth);
         setupLogoutButton(firebaseAuth);
     }
 
@@ -108,6 +123,39 @@ public class LoginActivity extends BaseActivity {
                 });
     }
 
+    private void setupSignInWithGoogleButton(FirebaseAuth firebaseAuth) {
+        setupButton(firebaseAuth,
+                signInWithGoogleButton,
+                v -> {
+                    v.setEnabled(false);
+                    onDestroy.add(RxJavaBridge
+                            .toV3Disposable(new RxInlineActivityResult(this)
+                                    .request(googleSignInClient.getSignInIntent())
+                                    .map(result -> {
+                                        Intent data = result.getData();
+                                        return GoogleSignIn.getSignedInAccountFromIntent(data)
+                                                .getResult();
+                                    })
+                                    .flatMapSingle(account -> {
+                                        String token = account.getIdToken();
+                                        AuthCredential credential = GoogleAuthProvider.getCredential(token);
+                                        return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
+                                    })
+                                    .doOnError(e -> {
+                                        toast(e.getMessage());
+                                        googleSignInClient.signOut();
+                                    })
+                                    .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2)));
+                },
+                auth -> {
+                    boolean isLoggedOut = !auth.isSignedIn();
+                    signInWithGoogleButton.setEnabled(isLoggedOut);
+                    if (isLoggedOut) {
+                        googleSignInClient.signOut();
+                    }
+                });
+    }
+
     private void setupLogoutButton(FirebaseAuth firebaseAuth) {
         setupButton(firebaseAuth,
                 logoutButton,
@@ -133,12 +181,4 @@ public class LoginActivity extends BaseActivity {
     private void toast(String text) {
         Toast.makeText(LoginActivity.this, text, Toast.LENGTH_LONG).show();
     }
-
-
-    private final Consumer<?> ON_NEXT_FINISH = new Consumer<Object>() {
-        @Override
-        public void accept(Object o) throws Throwable {
-            finish();
-        }
-    };
 }

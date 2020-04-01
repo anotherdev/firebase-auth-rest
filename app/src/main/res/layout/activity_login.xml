@@ -48,6 +48,13 @@
         </RelativeLayout>
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/auth_sign_in_with_google_button"
+            android:text="@string/sign_in__with_google"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="@android:dimen/app_icon_size" />
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/auth_logout_button"
             android:text="@string/log_out"
             android:layout_margin="8dp"
