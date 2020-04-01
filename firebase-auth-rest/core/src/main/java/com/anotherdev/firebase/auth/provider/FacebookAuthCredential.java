@@ -37,6 +37,6 @@ class FacebookAuthCredential implements AuthCredential {
     @NonNull
     @Override
     public String getPostBody() {
-        return String.format("access_token=%s&providerId=facebook.com", token);
+        return String.format("access_token=%s&providerId=%s", token, getProvider());
     }
 }
