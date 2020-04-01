@@ -8,7 +8,7 @@ public class FacebookAuthProvider {
     }
 
     @NonNull
-    public static AuthCredential getCredential(@NonNull String token) {
-        return new FacebookAuthCredential(token);
+    public static AuthCredential getCredential(@NonNull String token, @NonNull String oAuthRedirectUri) {
+        return new FacebookAuthCredential(token, oAuthRedirectUri);
     }
 }

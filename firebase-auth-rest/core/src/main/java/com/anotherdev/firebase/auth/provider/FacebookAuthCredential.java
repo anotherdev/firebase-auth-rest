@@ -7,9 +7,13 @@ class FacebookAuthCredential implements AuthCredential {
     @NonNull
     private final String token;
 
+    @NonNull
+    private final String oAuthRedirectUri;
 
-    FacebookAuthCredential(@NonNull String token) {
+
+    FacebookAuthCredential(@NonNull String token, @NonNull String oAuthRedirectUri) {
         this.token = token;
+        this.oAuthRedirectUri = oAuthRedirectUri;
     }
 
     @NonNull
@@ -27,7 +31,7 @@ class FacebookAuthCredential implements AuthCredential {
     @NonNull
     @Override
     public String getRequestUri() {
-        return "";
+        return oAuthRedirectUri;
     }
 
     @NonNull
