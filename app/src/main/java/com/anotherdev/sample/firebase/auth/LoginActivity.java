@@ -100,8 +100,11 @@ public class LoginActivity extends BaseActivity {
                     facebookLoginButton.performClick();
                 },
                 auth -> {
-                    signInWithFacebookButton.setEnabled(!auth.isSignedIn());
-                    // TODO logout if not local logout
+                    boolean isLoggedOut = !auth.isSignedIn();
+                    signInWithFacebookButton.setEnabled(isLoggedOut);
+                    if (isLoggedOut) {
+                        LoginManager.getInstance().logOut();
+                    }
                 });
     }
 
