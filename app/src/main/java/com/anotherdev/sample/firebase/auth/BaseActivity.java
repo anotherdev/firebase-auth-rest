@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
+import com.anotherdev.firebase.auth.util.RxUtil;
 import com.anotherdev.sample.firebase.auth.intent.LoginIntent;
 import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;
 import com.google.firebase.FirebaseApp;

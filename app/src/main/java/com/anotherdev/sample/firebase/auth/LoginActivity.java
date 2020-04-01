@@ -1,8 +1,10 @@
 package com.anotherdev.sample.firebase.auth;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,8 +12,15 @@ import androidx.appcompat.app.ActionBar;
 
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
+import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FacebookAuthProvider;
 
 import butterknife.BindView;
 import io.reactivex.rxjava3.functions.Consumer;
@@ -20,7 +29,7 @@ import io.reactivex.rxjava3.internal.functions.Functions;
 public class LoginActivity extends BaseActivity {
 
     @BindView(R.id.auth_sign_in_anonymously_button) Button signInAnonymouslyButton;
-    @BindView(R.id.auth_facebook_button) Button facebookLoginButton;
+    @BindView(R.id.auth_facebook_button) LoginButton facebookLoginButton;
     @BindView(R.id.auth_sign_in_with_facebook_button) Button signInWithFacebookButton;
     @BindView(R.id.auth_logout_button) Button logoutButton;
 
@@ -64,6 +73,18 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void setupSignInWithFacebookButton(FirebaseAuth firebaseAuth) {
+        facebookLoginButton.setPermissions("email", "public_profile");
+        facebookLoginButton.registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                String token = loginResult.getAccessToken().getToken();
+                AuthCredential credential = FacebookAuthProvider.getCredential(token);
+                onDestroy.add(firebaseAuth.signInWithCredential(credential)
+                        .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
+            }
+            @Override public void onCancel() { toast("Facebook Login canceled"); }
+            @Override public void onError(FacebookException error) { toast(error.getMessage()); }
+        });
         setupButton(firebaseAuth,
                 signInWithFacebookButton,
                 v -> {
@@ -87,6 +108,16 @@ public class LoginActivity extends BaseActivity {
         button.setOnClickListener(onClick);
         onDestroy.add(firebaseAuth.authStateChanges()
                 .subscribe(authStateConsumer, RxUtil.ON_ERROR_LOG_V3));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        facebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void toast(String text) {
+        Toast.makeText(LoginActivity.this, text, Toast.LENGTH_LONG).show();
     }
 
 
