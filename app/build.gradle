@@ -45,7 +45,6 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
 
     //implementation "com.google.firebase:firebase-analytics:17.2.3"
-    implementation "com.google.firebase:firebase-auth:19.3.0"
     implementation 'com.google.firebase:firebase-database:19.2.1'
 
     implementation "io.reactivex.rxjava2:rxjava:2.2.19"

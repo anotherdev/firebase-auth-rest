@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.data.Data;
+import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
@@ -16,12 +17,11 @@ import com.f2prateek.rx.preferences2.Preference;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.internal.IdTokenListener;
 import com.google.firebase.internal.InternalTokenResult;
 import com.google.firebase.internal.api.FirebaseNoSignedInUserException;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,6 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.internal.functions.Functions;
-import kotlin.NotImplementedError;
 import timber.log.Timber;
 
 public class RestAuthProvider implements FirebaseAuth {
@@ -75,8 +74,15 @@ public class RestAuthProvider implements FirebaseAuth {
     }
 
     @Override
-    public Single<AuthResult> signInWithCredential(AuthCredential credential) {
-        return Single.error(new NotImplementedError());
+    public Single<SignInAnonymouslyResponse> signInWithCredential(AuthCredential credential) {
+        JsonObject json = new JsonObject();
+        json.addProperty("requestUri", credential.getRequestUri());
+        json.addProperty("postBody", credential.getPostBody());
+        json.addProperty("returnSecureToken", credential.returnSecureToken());
+        json.addProperty("returnIdpCredential", credential.returnIdpCredential());
+        return RestAuthApi.auth()
+                .signInWithCredential(json)
+                .map(saveAnonymousUser);
     }
 
     @Override

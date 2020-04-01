@@ -12,6 +12,8 @@ import androidx.appcompat.app.ActionBar;
 
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
+import com.anotherdev.firebase.auth.provider.AuthCredential;
+import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -19,8 +21,6 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FacebookAuthProvider;
 
 import butterknife.BindView;
 import io.reactivex.rxjava3.functions.Consumer;
