@@ -18,11 +18,13 @@ import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.firebase.FirebaseApp;
 
 import butterknife.BindView;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.internal.functions.Functions;
 
@@ -80,6 +82,11 @@ public class LoginActivity extends BaseActivity {
                 String token = loginResult.getAccessToken().getToken();
                 AuthCredential credential = FacebookAuthProvider.getCredential(token);
                 onDestroy.add(firebaseAuth.signInWithCredential(credential)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnError(e -> {
+                            toast(e.getMessage());
+                            LoginManager.getInstance().logOut();
+                        })
                         .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
             }
             @Override public void onCancel() { toast("Facebook Login canceled"); }
@@ -91,7 +98,10 @@ public class LoginActivity extends BaseActivity {
                     v.setEnabled(false);
                     facebookLoginButton.performClick();
                 },
-                auth -> signInWithFacebookButton.setEnabled(!auth.isSignedIn()));
+                auth -> {
+                    signInWithFacebookButton.setEnabled(!auth.isSignedIn());
+                    // TODO logout if not local logout
+                });
     }
 
     private void setupLogoutButton(FirebaseAuth firebaseAuth) {
