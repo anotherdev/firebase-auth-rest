@@ -35,6 +35,8 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
 
+    implementation "com.afollestad.material-dialogs:input:3.3.0"
+
     implementation "com.google.android.gms:play-services-auth:18.0.0"
 
     implementation 'com.facebook.android:facebook-login:6.3.0'
