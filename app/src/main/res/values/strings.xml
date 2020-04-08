@@ -5,6 +5,7 @@
     <string name="accounts">Accounts</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="register">Register</string>
 
     <string name="sign_in_anonymously">Sign In Anonymously</string>
     <string name="register_email_password">Register Email/Password</string>
