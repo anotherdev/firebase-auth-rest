@@ -37,6 +37,7 @@ import io.reactivex.rxjava3.internal.functions.Functions;
 public class LoginActivity extends BaseActivity {
 
     @BindView(R.id.auth_sign_in_anonymously_button) Button signInAnonymouslyButton;
+    @BindView(R.id.auth_register_email_button) Button registerEmailButton;
     @BindView(R.id.auth_facebook_button) LoginButton facebookLoginButton;
     @BindView(R.id.auth_sign_in_with_facebook_button) Button signInWithFacebookButton;
     @BindView(R.id.auth_sign_in_with_google_button) Button signInWithGoogleButton;
@@ -73,6 +74,7 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
         FirebaseAuth firebaseAuth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
         setupSignInAnonymouslyButton(firebaseAuth);
+        setupRegisterEmailButton(firebaseAuth);
         setupSignInWithFacebookButton(firebaseAuth);
         setupSignInWithGoogleButton(firebaseAuth);
         setupLogoutButton(firebaseAuth);
@@ -87,6 +89,15 @@ public class LoginActivity extends BaseActivity {
                             .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
                 },
                 auth -> signInAnonymouslyButton.setEnabled(!auth.isSignedIn()));
+    }
+
+    private void setupRegisterEmailButton(FirebaseAuth firebaseAuth) {
+        setupButton(firebaseAuth,
+                registerEmailButton,
+                v -> {
+                    v.setEnabled(false);
+                },
+                auth -> registerEmailButton.setEnabled(!auth.isSignedIn()));
     }
 
     private void setupSignInWithFacebookButton(FirebaseAuth firebaseAuth) {
