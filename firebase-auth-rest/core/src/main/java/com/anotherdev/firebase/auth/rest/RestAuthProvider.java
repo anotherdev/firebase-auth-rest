@@ -10,7 +10,7 @@ import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
-import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyResponse;
+import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.f2prateek.rx.preferences2.Preference;
@@ -67,14 +67,14 @@ public class RestAuthProvider implements FirebaseAuth {
     }
 
     @Override
-    public Single<SignInAnonymouslyResponse> signInAnonymously() {
+    public Single<SignInResponse> signInAnonymously() {
         return RestAuthApi.auth()
                 .signInAnonymously(new SignInAnonymouslyRequest())
                 .map(saveAnonymousUser);
     }
 
     @Override
-    public Single<SignInAnonymouslyResponse> signInWithCredential(AuthCredential credential) {
+    public Single<SignInResponse> signInWithCredential(AuthCredential credential) {
         JsonObject json = new JsonObject();
         json.addProperty("requestUri", credential.getRequestUri());
         json.addProperty("postBody", credential.getPostBody());
@@ -151,7 +151,7 @@ public class RestAuthProvider implements FirebaseAuth {
         }
     }
 
-    private final Function<SignInAnonymouslyResponse, SignInAnonymouslyResponse> saveAnonymousUser = response -> {
+    private final Function<SignInResponse, SignInResponse> saveAnonymousUser = response -> {
         String idToken = response.getIdToken();
         String refreshToken = response.getRefreshToken();
         saveCurrentUser(idToken, refreshToken);

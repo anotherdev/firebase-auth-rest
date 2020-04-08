@@ -1,6 +1,6 @@
 package com.anotherdev.firebase.auth.rest.api.model;
 
-public class SignInAnonymouslyResponse {
+public class SignInResponse {
 
     String idToken;
     String email;
