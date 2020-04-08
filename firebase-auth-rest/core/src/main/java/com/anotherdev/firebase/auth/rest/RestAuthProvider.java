@@ -9,7 +9,7 @@ import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
-import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.anotherdev.firebase.auth.util.RxUtil;
@@ -69,7 +69,7 @@ public class RestAuthProvider implements FirebaseAuth {
     @Override
     public Single<SignInResponse> signInAnonymously() {
         return RestAuthApi.auth()
-                .signInAnonymously(new SignInAnonymouslyRequest())
+                .signInAnonymously(new SignInRequest())
                 .map(saveAnonymousUser);
     }
 

@@ -1,7 +1,7 @@
 package com.anotherdev.firebase.auth.rest.api;
 
 import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
-import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.google.gson.JsonObject;
 
@@ -16,7 +16,7 @@ public interface IdentityToolkitApi {
 
 
     @POST("v1/accounts:signUp")
-    Single<SignInResponse> signInAnonymously(@Body SignInAnonymouslyRequest request);
+    Single<SignInResponse> signInAnonymously(@Body SignInRequest request);
 
     @POST("v1/accounts:signUp")
     Single<SignInResponse> createUserWithEmailAndPassword(@Body JsonObject request);
