@@ -1,6 +1,20 @@
 package com.anotherdev.firebase.auth.rest.api.model;
 
-public class SignInRequest {
+import com.google.gson.annotations.SerializedName;
 
+import org.immutables.gson.Gson;
+import org.immutables.value.Value;
+
+@Value.Immutable
+@Value.Style(strictBuilder = true)
+@Gson.TypeAdapters
+public interface SignInRequest {
+
+    @SerializedName("requestSecureToken")
     boolean requestSecureToken = true;
+
+
+    static ImmutableSignInRequest.Builder builder() {
+        return ImmutableSignInRequest.builder();
+    }
 }

@@ -69,7 +69,7 @@ public class RestAuthProvider implements FirebaseAuth {
     @Override
     public Single<SignInResponse> signInAnonymously() {
         return RestAuthApi.auth()
-                .signInAnonymously(new SignInRequest())
+                .signInAnonymously(SignInRequest.builder().build())
                 .map(saveAnonymousUser);
     }
 
