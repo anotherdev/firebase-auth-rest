@@ -83,11 +83,8 @@ public class LoginActivity extends BaseActivity {
     private void setupSignInAnonymouslyButton(FirebaseAuth firebaseAuth) {
         setupButton(firebaseAuth,
                 signInAnonymouslyButton,
-                v -> {
-                    v.setEnabled(false);
-                    onDestroy.add(firebaseAuth.signInAnonymously()
-                            .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
-                },
+                v -> onDestroy.add(firebaseAuth.signInAnonymously()
+                        .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3)),
                 auth -> signInAnonymouslyButton.setEnabled(!auth.isSignedIn()));
     }
 
@@ -95,7 +92,6 @@ public class LoginActivity extends BaseActivity {
         setupButton(firebaseAuth,
                 registerEmailButton,
                 v -> {
-                    v.setEnabled(false);
                 },
                 auth -> registerEmailButton.setEnabled(!auth.isSignedIn()));
     }
@@ -121,10 +117,7 @@ public class LoginActivity extends BaseActivity {
         });
         setupButton(firebaseAuth,
                 signInWithFacebookButton,
-                v -> {
-                    v.setEnabled(false);
-                    facebookLoginButton.performClick();
-                },
+                v -> facebookLoginButton.performClick(),
                 auth -> {
                     boolean isLoggedOut = !auth.isSignedIn();
                     signInWithFacebookButton.setEnabled(isLoggedOut);
@@ -137,27 +130,24 @@ public class LoginActivity extends BaseActivity {
     private void setupSignInWithGoogleButton(FirebaseAuth firebaseAuth) {
         setupButton(firebaseAuth,
                 signInWithGoogleButton,
-                v -> {
-                    v.setEnabled(false);
-                    onDestroy.add(RxJavaBridge
-                            .toV3Disposable(new RxInlineActivityResult(this)
-                                    .request(googleSignInClient.getSignInIntent())
-                                    .map(result -> {
-                                        Intent data = result.getData();
-                                        return GoogleSignIn.getSignedInAccountFromIntent(data)
-                                                .getResult();
-                                    })
-                                    .flatMapSingle(account -> {
-                                        String token = account.getIdToken();
-                                        AuthCredential credential = GoogleAuthProvider.getCredential(token);
-                                        return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
-                                    })
-                                    .doOnError(e -> {
-                                        toast(e.getMessage());
-                                        googleSignInClient.signOut();
-                                    })
-                                    .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2)));
-                },
+                v -> onDestroy.add(RxJavaBridge
+                        .toV3Disposable(new RxInlineActivityResult(this)
+                                .request(googleSignInClient.getSignInIntent())
+                                .map(result -> {
+                                    Intent data = result.getData();
+                                    return GoogleSignIn.getSignedInAccountFromIntent(data)
+                                            .getResult();
+                                })
+                                .flatMapSingle(account -> {
+                                    String token = account.getIdToken();
+                                    AuthCredential credential = GoogleAuthProvider.getCredential(token);
+                                    return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
+                                })
+                                .doOnError(e -> {
+                                    toast(e.getMessage());
+                                    googleSignInClient.signOut();
+                                })
+                                .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2))),
                 auth -> {
                     boolean isLoggedOut = !auth.isSignedIn();
                     signInWithGoogleButton.setEnabled(isLoggedOut);
@@ -178,7 +168,10 @@ public class LoginActivity extends BaseActivity {
                              @NonNull Button button,
                              @NonNull View.OnClickListener onClick,
                              @NonNull Consumer<FirebaseAuth> authStateConsumer) {
-        button.setOnClickListener(onClick);
+        button.setOnClickListener(v -> {
+            v.setEnabled(false);
+            onClick.onClick(v);
+        });
         onDestroy.add(firebaseAuth.authStateChanges()
                 .subscribe(authStateConsumer, RxUtil.ON_ERROR_LOG_V3));
     }
