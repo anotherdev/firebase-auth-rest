@@ -3,6 +3,7 @@ package com.anotherdev.firebase.auth.rest.api;
 import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
+import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.google.gson.JsonObject;
 
 import io.reactivex.rxjava3.core.Single;
@@ -19,7 +20,7 @@ public interface IdentityToolkitApi {
     Single<SignInResponse> signInAnonymously(@Body SignInRequest request);
 
     @POST("v1/accounts:signUp")
-    Single<SignInResponse> createUserWithEmailAndPassword(@Body JsonObject request);
+    Single<SignInResponse> createUserWithEmailAndPassword(@Body SignInWithEmailPasswordRequest request);
 
     @POST("v1/accounts:signInWithIdp")
     Single<SignInResponse> signInWithCredential(@Body JsonObject request);

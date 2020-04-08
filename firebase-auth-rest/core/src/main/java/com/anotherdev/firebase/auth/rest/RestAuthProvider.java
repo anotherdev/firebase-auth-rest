@@ -11,6 +11,7 @@ import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
+import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.f2prateek.rx.preferences2.Preference;
@@ -75,12 +76,12 @@ public class RestAuthProvider implements FirebaseAuth {
 
     @Override
     public Single<SignInResponse> createUserWithEmailAndPassword(String email, String password) {
-        JsonObject json = new JsonObject();
-        json.addProperty("email", email);
-        json.addProperty("password", password);
-        json.addProperty("returnSecureToken", true);
+        SignInWithEmailPasswordRequest request = SignInWithEmailPasswordRequest.builder()
+                .email(email)
+                .password(password)
+                .build();
         return RestAuthApi.auth()
-                .createUserWithEmailAndPassword(json)
+                .createUserWithEmailAndPassword(request)
                 .map(saveAnonymousUser);
     }
 
