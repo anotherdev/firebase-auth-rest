@@ -121,6 +121,8 @@ public class RestAuthProvider implements FirebaseAuth {
                 ExchangeTokenRequest request = ExchangeTokenRequest.builder()
                         .refreshToken(user.getRefreshToken())
                         .build();
+
+                //noinspection ResultOfMethodCallIgnored
                 RestAuthApi.token()
                         .exchangeToken(request)
                         .map(response -> {
