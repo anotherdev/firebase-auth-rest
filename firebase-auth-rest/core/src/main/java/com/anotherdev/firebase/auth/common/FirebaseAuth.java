@@ -4,7 +4,7 @@ import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
-import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyResponse;
+import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.google.firebase.auth.internal.InternalAuthProvider;
 
 import io.reactivex.rxjava3.annotations.CheckReturnValue;
@@ -22,10 +22,10 @@ public interface FirebaseAuth extends InternalAuthProvider {
     Observable<FirebaseAuth> authStateChanges();
 
     @CheckReturnValue
-    Single<SignInAnonymouslyResponse> signInAnonymously();
+    Single<SignInResponse> signInAnonymously();
 
     @CheckReturnValue
-    Single<SignInAnonymouslyResponse> signInWithCredential(AuthCredential credential);
+    Single<SignInResponse> signInWithCredential(AuthCredential credential);
 
     void signOut();
 }
