@@ -35,8 +35,6 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
 
-    implementation "com.afollestad.material-dialogs:input:3.3.0"
-
     implementation "com.google.android.gms:play-services-auth:18.0.0"
 
     implementation 'com.facebook.android:facebook-login:6.3.0'
@@ -45,11 +43,13 @@ dependencies {
 
     implementation "com.github.florent37:inline-activity-result-rx:1.0.3"
 
-    implementation 'com.jakewharton:butterknife:10.2.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
+    implementation "com.jakewharton:butterknife:10.2.1"
+    annotationProcessor "com.jakewharton:butterknife-compiler:10.2.1"
 
-    //implementation "com.google.firebase:firebase-analytics:17.2.3"
-    implementation 'com.google.firebase:firebase-database:19.2.1'
+    implementation "com.google.firebase:firebase-analytics:17.3.0"
+    implementation "com.google.firebase:firebase-database:19.2.1"
+
+    implementation "com.yarolegovich:lovely-dialog:1.1.0"
 
     implementation "io.reactivex.rxjava2:rxjava:2.2.19"
     implementation "io.reactivex.rxjava3:rxandroid:3.0.0"
