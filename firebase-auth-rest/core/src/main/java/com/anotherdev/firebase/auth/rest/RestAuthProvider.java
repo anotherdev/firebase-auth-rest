@@ -74,6 +74,17 @@ public class RestAuthProvider implements FirebaseAuth {
     }
 
     @Override
+    public Single<SignInResponse> createUserWithEmailAndPassword(String email, String password) {
+        JsonObject json = new JsonObject();
+        json.addProperty("email", email);
+        json.addProperty("password", password);
+        json.addProperty("returnSecureToken", true);
+        return RestAuthApi.auth()
+                .createUserWithEmailAndPassword(json)
+                .map(saveAnonymousUser);
+    }
+
+    @Override
     public Single<SignInResponse> signInWithCredential(AuthCredential credential) {
         JsonObject json = new JsonObject();
         json.addProperty("requestUri", credential.getRequestUri());

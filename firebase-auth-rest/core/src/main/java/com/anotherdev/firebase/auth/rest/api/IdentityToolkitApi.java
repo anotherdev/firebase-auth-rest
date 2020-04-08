@@ -18,6 +18,9 @@ public interface IdentityToolkitApi {
     @POST("v1/accounts:signUp")
     Single<SignInResponse> signInAnonymously(@Body SignInAnonymouslyRequest request);
 
+    @POST("v1/accounts:signUp")
+    Single<SignInResponse> createUserWithEmailAndPassword(@Body JsonObject request);
+
     @POST("v1/accounts:signInWithIdp")
     Single<SignInResponse> signInWithCredential(@Body JsonObject request);
 
