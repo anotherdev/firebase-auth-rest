@@ -10,8 +10,11 @@ import org.immutables.value.Value;
 @Gson.TypeAdapters
 public interface SignInRequest {
 
+    @Value.Default
     @SerializedName("requestSecureToken")
-    boolean requestSecureToken = true;
+    default boolean requestSecureToken() {
+        return true;
+    }
 
 
     static ImmutableSignInRequest.Builder builder() {
