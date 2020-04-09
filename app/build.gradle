@@ -30,8 +30,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    //implementation "com.github.anotherdev:firebase-auth-rest:$versionName"
-    implementation project(':firebase-auth-rest:core')
+    releaseImplementation "com.github.anotherdev:firebase-auth-rest:$versionName"
+    debugImplementation project(':firebase-auth-rest:core')
 
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
 
