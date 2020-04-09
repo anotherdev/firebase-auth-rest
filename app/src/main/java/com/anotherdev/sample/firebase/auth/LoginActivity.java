@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 
 import com.anotherdev.firebase.auth.AuthError;
@@ -33,6 +34,7 @@ import com.yarolegovich.lovelydialog.LovelyInfoDialog;
 import butterknife.BindView;
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.internal.functions.Functions;
 
@@ -40,6 +42,7 @@ public class LoginActivity extends BaseActivity {
 
     @BindView(R.id.auth_sign_in_anonymously_button) Button signInAnonymouslyButton;
     @BindView(R.id.auth_register_email_button) Button registerEmailButton;
+    @BindView(R.id.auth_sign_in_email_button) Button signInWithEmailButton;
     @BindView(R.id.auth_facebook_button) LoginButton facebookLoginButton;
     @BindView(R.id.auth_sign_in_with_facebook_button) Button signInWithFacebookButton;
     @BindView(R.id.auth_sign_in_with_google_button) Button signInWithGoogleButton;
@@ -77,6 +80,7 @@ public class LoginActivity extends BaseActivity {
         FirebaseAuth firebaseAuth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
         setupSignInAnonymouslyButton(firebaseAuth);
         setupRegisterEmailButton(firebaseAuth);
+        setupSignInWithEmailButton(firebaseAuth);
         setupSignInWithFacebookButton(firebaseAuth);
         setupSignInWithGoogleButton(firebaseAuth);
         setupLogoutButton(firebaseAuth);
@@ -93,16 +97,42 @@ public class LoginActivity extends BaseActivity {
     private void setupRegisterEmailButton(FirebaseAuth firebaseAuth) {
         setupButton(firebaseAuth,
                 registerEmailButton,
-                v ->  new EmailPasswordDialog(this)
-                        .onConfirm((email, password) -> onDestroy.add(firebaseAuth.createUserWithEmailAndPassword(email, password)
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .doOnError(e -> {
-                                    dialog(e);
-                                    registerEmailButton.setEnabled(true);
-                                })
-                                .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3)))
+                v ->  emailConfigureView(
+                        registerEmailButton,
+                        R.string.register,
+                        firebaseAuth::createUserWithEmailAndPassword)
                         .show(),
                 auth -> registerEmailButton.setEnabled(!auth.isSignedIn()));
+    }
+
+    private void setupSignInWithEmailButton(FirebaseAuth firebaseAuth) {
+        setupButton(firebaseAuth,
+                signInWithEmailButton,
+                v -> emailConfigureView(
+                        signInWithEmailButton,
+                        R.string.sign_in__with_email,
+                        firebaseAuth::signInWithEmailAndPassword)
+                        .show(),
+                auth -> signInWithEmailButton.setEnabled(!auth.isSignedIn()));
+    }
+
+    private EmailPasswordDialog emailConfigureView(Button button,
+                                                   @StringRes int confirmTextRes,
+                                                   EmailPasswordDialog.OnConfirmClickListener listener) {
+        return new EmailPasswordDialog(this)
+                .setConfirmButtonText(confirmTextRes)
+                .onConfirm((email, password) -> {
+                    //noinspection ResultOfMethodCallIgnored
+                    listener.onConfirmClick(email, password)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .doOnSubscribe(onDestroy::add)
+                            .doOnError(e -> {
+                                dialog(e);
+                                button.setEnabled(true);
+                            })
+                            .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
+                    return Single.error(new UnsupportedOperationException());
+                });
     }
 
     private void setupSignInWithFacebookButton(FirebaseAuth firebaseAuth) {

@@ -1,19 +1,24 @@
 package com.anotherdev.sample.firebase.auth;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.StringRes;
+
+import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.yarolegovich.lovelydialog.LovelyCustomDialog;
+
+import io.reactivex.rxjava3.core.Single;
 
 public class EmailPasswordDialog extends LovelyCustomDialog {
 
     public interface OnConfirmClickListener {
-        void onConfirmClick(String email, String password);
+        Single<SignInResponse> onConfirmClick(String email, String password);
     }
 
+    private TextView positiveButton;
     private EditText emailEditText;
     private EditText passwordEditText;
 
@@ -23,12 +28,10 @@ public class EmailPasswordDialog extends LovelyCustomDialog {
     public EmailPasswordDialog(Context context) {
         super(context);
         setTopColorRes(R.color.colorPrimary);
-        setTitle(R.string.register_email_password);
         setIcon(android.R.drawable.ic_dialog_email);
         setView(R.layout.view_email_password_input);
         configureView(dialog -> {
-            TextView ok = dialog.findViewById(R.id.positive_button);
-            ok.setText(R.string.register);
+            positiveButton = dialog.findViewById(R.id.positive_button);
             emailEditText = dialog.findViewById(R.id.email_edittext);
             passwordEditText = dialog.findViewById(R.id.password_edittext);
         });
@@ -41,6 +44,11 @@ public class EmailPasswordDialog extends LovelyCustomDialog {
             dispatchOnConfirmClick();
             listener.onClick(v);
         });
+        return this;
+    }
+
+    public EmailPasswordDialog setConfirmButtonText(@StringRes int confirmTextRes) {
+        positiveButton.setText(confirmTextRes);
         return this;
     }
 
