@@ -100,8 +100,7 @@ public class LoginActivity extends BaseActivity {
                 v ->  emailConfigureView(
                         registerEmailButton,
                         R.string.register,
-                        firebaseAuth::createUserWithEmailAndPassword)
-                        .show(),
+                        firebaseAuth::createUserWithEmailAndPassword),
                 auth -> registerEmailButton.setEnabled(!auth.isSignedIn()));
     }
 
@@ -111,15 +110,14 @@ public class LoginActivity extends BaseActivity {
                 v -> emailConfigureView(
                         signInWithEmailButton,
                         R.string.sign_in__with_email,
-                        firebaseAuth::signInWithEmailAndPassword)
-                        .show(),
+                        firebaseAuth::signInWithEmailAndPassword),
                 auth -> signInWithEmailButton.setEnabled(!auth.isSignedIn()));
     }
 
-    private EmailPasswordDialog emailConfigureView(Button button,
-                                                   @StringRes int confirmTextRes,
-                                                   EmailPasswordDialog.OnConfirmClickListener listener) {
-        return new EmailPasswordDialog(this)
+    private void emailConfigureView(Button button,
+                                    @StringRes int confirmTextRes,
+                                    EmailPasswordDialog.OnConfirmClickListener listener) {
+        new EmailPasswordDialog(this)
                 .setConfirmButtonText(confirmTextRes)
                 .onConfirm((email, password) -> {
                     //noinspection ResultOfMethodCallIgnored
@@ -132,7 +130,9 @@ public class LoginActivity extends BaseActivity {
                             })
                             .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
                     return Single.error(new UnsupportedOperationException());
-                });
+                })
+                .show()
+                .setOnDismissListener(dialog -> button.setEnabled(true));
     }
 
     private void setupSignInWithFacebookButton(FirebaseAuth firebaseAuth) {
