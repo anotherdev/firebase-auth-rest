@@ -50,6 +50,12 @@ public class RestAuthProvider implements FirebaseAuth {
         user = Data.from(app.getApplicationContext()).getCurrentUser(SIGNED_OUT);
     }
 
+    @NonNull
+    @Override
+    public FirebaseApp getApp() {
+        return app;
+    }
+
     @Nullable
     @Override
     public FirebaseUser getCurrentUser() {
