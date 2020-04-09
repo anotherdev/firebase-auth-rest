@@ -67,12 +67,14 @@ public class RestAuthProvider implements FirebaseAuth {
         return user.isSet();
     }
 
+    @NonNull
     @Override
     public Observable<FirebaseAuth> authStateChanges() {
         return RxJavaBridge.toV3Observable(user.asObservable())
                 .map(firebaseUser -> RestAuthProvider.this);
     }
 
+    @NonNull
     @Override
     public Single<SignInResponse> signInAnonymously() {
         return RestAuthApi.auth()
@@ -80,6 +82,7 @@ public class RestAuthProvider implements FirebaseAuth {
                 .map(saveAnonymousUser);
     }
 
+    @NonNull
     @Override
     public Single<SignInResponse> createUserWithEmailAndPassword(String email, String password) {
         SignInWithEmailPasswordRequest request = SignInWithEmailPasswordRequest.builder()
@@ -91,6 +94,7 @@ public class RestAuthProvider implements FirebaseAuth {
                 .map(saveAnonymousUser);
     }
 
+    @NonNull
     @Override
     public Single<SignInResponse> signInWithEmailAndPassword(String email, String password) {
         SignInWithEmailPasswordRequest request = SignInWithEmailPasswordRequest.builder()
@@ -102,6 +106,7 @@ public class RestAuthProvider implements FirebaseAuth {
                 .map(saveAnonymousUser);
     }
 
+    @NonNull
     @Override
     public Single<SignInResponse> signInWithCredential(AuthCredential credential) {
         JsonObject json = new JsonObject();
