@@ -3,6 +3,8 @@ package com.anotherdev.firebase.auth.provider;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.anotherdev.firebase.auth.common.FirebaseAuth;
+
 class GoogleAuthCredential implements AuthCredential {
 
     @Nullable
@@ -27,7 +29,7 @@ class GoogleAuthCredential implements AuthCredential {
 
     @NonNull
     @Override
-    public String getRequestUri() {
+    public String getRequestUri(FirebaseAuth auth) {
         return "http://localhost";
     }
 

@@ -110,7 +110,7 @@ public class RestAuthProvider implements FirebaseAuth {
     @Override
     public Single<SignInResponse> signInWithCredential(AuthCredential credential) {
         JsonObject json = new JsonObject();
-        json.addProperty("requestUri", credential.getRequestUri());
+        json.addProperty("requestUri", credential.getRequestUri(this));
         json.addProperty("postBody", credential.getPostBody());
         json.addProperty("returnSecureToken", credential.returnSecureToken());
         json.addProperty("returnIdpCredential", credential.returnIdpCredential());

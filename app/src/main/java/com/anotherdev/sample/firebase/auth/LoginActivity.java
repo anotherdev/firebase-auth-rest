@@ -141,8 +141,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 String token = loginResult.getAccessToken().getToken();
-                String oAuthRedirectUri = "https://huawei-dtse.firebaseapp.com/__/auth/handler";
-                AuthCredential credential = FacebookAuthProvider.getCredential(token, oAuthRedirectUri);
+                AuthCredential credential = FacebookAuthProvider.getCredential(token);
                 onDestroy.add(firebaseAuth.signInWithCredential(credential)
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(e -> {

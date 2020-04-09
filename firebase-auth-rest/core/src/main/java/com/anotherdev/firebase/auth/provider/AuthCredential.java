@@ -2,6 +2,8 @@ package com.anotherdev.firebase.auth.provider;
 
 import androidx.annotation.NonNull;
 
+import com.anotherdev.firebase.auth.common.FirebaseAuth;
+
 public interface AuthCredential {
 
     @NonNull
@@ -11,7 +13,7 @@ public interface AuthCredential {
     String getSignInMethod();
 
     @NonNull
-    String getRequestUri();
+    String getRequestUri(FirebaseAuth auth);
 
     @NonNull
     String getPostBody();

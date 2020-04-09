@@ -2,18 +2,16 @@ package com.anotherdev.firebase.auth.provider;
 
 import androidx.annotation.NonNull;
 
+import com.anotherdev.firebase.auth.common.FirebaseAuth;
+
 class FacebookAuthCredential implements AuthCredential {
 
     @NonNull
     private final String token;
 
-    @NonNull
-    private final String oAuthRedirectUri;
 
-
-    FacebookAuthCredential(@NonNull String token, @NonNull String oAuthRedirectUri) {
+    FacebookAuthCredential(@NonNull String token) {
         this.token = token;
-        this.oAuthRedirectUri = oAuthRedirectUri;
     }
 
     @NonNull
@@ -30,8 +28,9 @@ class FacebookAuthCredential implements AuthCredential {
 
     @NonNull
     @Override
-    public String getRequestUri() {
-        return oAuthRedirectUri;
+    public String getRequestUri(FirebaseAuth auth) {
+        String projectId = auth.getApp().getOptions().getProjectId();
+        return String.format("https://%s.firebaseapp.com/__/auth/handler", projectId);
     }
 
     @NonNull
