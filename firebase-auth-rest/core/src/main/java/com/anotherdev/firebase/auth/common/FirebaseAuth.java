@@ -28,6 +28,9 @@ public interface FirebaseAuth extends InternalAuthProvider {
     Single<SignInResponse> createUserWithEmailAndPassword(String email, String password);
 
     @CheckReturnValue
+    Single<SignInResponse> signInWithEmailAndPassword(String email, String password);
+
+    @CheckReturnValue
     Single<SignInResponse> signInWithCredential(AuthCredential credential);
 
     void signOut();

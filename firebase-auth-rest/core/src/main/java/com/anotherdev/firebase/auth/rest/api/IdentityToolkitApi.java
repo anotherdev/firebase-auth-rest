@@ -22,6 +22,9 @@ public interface IdentityToolkitApi {
     @POST("v1/accounts:signUp")
     Single<SignInResponse> createUserWithEmailAndPassword(@Body SignInWithEmailPasswordRequest request);
 
+    @POST("v1/accounts:signInWithPassword")
+    Single<SignInResponse> signInWithEmailAndPassword(@Body SignInWithEmailPasswordRequest request);
+
     @POST("v1/accounts:signInWithIdp")
     Single<SignInResponse> signInWithCredential(@Body JsonObject request);
 
