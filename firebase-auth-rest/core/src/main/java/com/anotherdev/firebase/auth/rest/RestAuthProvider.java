@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.data.Data;
-import com.anotherdev.firebase.auth.provider.AuthCredential;
+import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
@@ -108,7 +108,7 @@ public class RestAuthProvider implements FirebaseAuth {
 
     @NonNull
     @Override
-    public Single<SignInResponse> signInWithCredential(AuthCredential credential) {
+    public Single<SignInResponse> signInWithCredential(IdpAuthCredential credential) {
         SignInWithIdpRequest request = SignInWithIdpRequest.builder()
                 .requestUri(credential.getRequestUri(this))
                 .postBody(credential.getPostBody())

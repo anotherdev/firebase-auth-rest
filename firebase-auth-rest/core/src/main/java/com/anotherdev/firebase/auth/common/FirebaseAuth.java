@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.FirebaseUser;
-import com.anotherdev.firebase.auth.provider.AuthCredential;
+import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.internal.InternalAuthProvider;
@@ -41,7 +41,7 @@ public interface FirebaseAuth extends InternalAuthProvider {
 
     @NonNull
     @CheckReturnValue
-    Single<SignInResponse> signInWithCredential(AuthCredential credential);
+    Single<SignInResponse> signInWithCredential(IdpAuthCredential credential);
 
     void signOut();
 }

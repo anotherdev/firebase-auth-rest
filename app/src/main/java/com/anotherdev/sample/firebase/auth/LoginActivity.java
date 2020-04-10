@@ -14,9 +14,9 @@ import androidx.appcompat.app.ActionBar;
 import com.anotherdev.firebase.auth.AuthError;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
-import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
+import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -141,7 +141,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 String token = loginResult.getAccessToken().getToken();
-                AuthCredential credential = FacebookAuthProvider.getCredential(token);
+                IdpAuthCredential credential = FacebookAuthProvider.getCredential(token);
                 onDestroy.add(firebaseAuth.signInWithCredential(credential)
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(e -> {
@@ -178,7 +178,7 @@ public class LoginActivity extends BaseActivity {
                                 })
                                 .flatMapSingle(account -> {
                                     String token = account.getIdToken();
-                                    AuthCredential credential = GoogleAuthProvider.getCredential(token);
+                                    IdpAuthCredential credential = GoogleAuthProvider.getCredential(token);
                                     return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
                                 })
                                 .doOnError(e -> {
