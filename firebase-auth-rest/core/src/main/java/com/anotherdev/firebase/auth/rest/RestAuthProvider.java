@@ -9,6 +9,7 @@ import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
+import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithIdpRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
@@ -84,7 +85,7 @@ public class RestAuthProvider implements FirebaseAuth {
 
     @NonNull
     @Override
-    public Single<SignInResponse> createUserWithEmailAndPassword(String email, String password) {
+    public Single<SignInResponse> createUserWithEmailAndPassword(@NonNull String email, @NonNull String password) {
         SignInWithEmailPasswordRequest request = SignInWithEmailPasswordRequest.builder()
                 .email(email)
                 .password(password)
@@ -96,7 +97,7 @@ public class RestAuthProvider implements FirebaseAuth {
 
     @NonNull
     @Override
-    public Single<SignInResponse> signInWithEmailAndPassword(String email, String password) {
+    public Single<SignInResponse> signInWithEmailAndPassword(@NonNull String email, @NonNull String password) {
         SignInWithEmailPasswordRequest request = SignInWithEmailPasswordRequest.builder()
                 .email(email)
                 .password(password)
@@ -108,8 +109,22 @@ public class RestAuthProvider implements FirebaseAuth {
 
     @NonNull
     @Override
-    public Single<SignInResponse> signInWithCredential(IdpAuthCredential credential) {
-        SignInWithIdpRequest request = SignInWithIdpRequest.builder()
+    public Single<SignInResponse> signInWithCredential(@NonNull IdpAuthCredential credential) {
+        ImmutableSignInWithIdpRequest.Builder builder = SignInWithIdpRequest.builder();
+        return performSignInWithCredential(builder, credential);
+    }
+
+    @NonNull
+    @Override
+    public Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull IdpAuthCredential credential) {
+        String idToken = user.getIdToken();
+        ImmutableSignInWithIdpRequest.Builder builder = SignInWithIdpRequest.builder().idToken(idToken);
+        return performSignInWithCredential(builder, credential);
+    }
+
+    private Single<SignInResponse> performSignInWithCredential(ImmutableSignInWithIdpRequest.Builder builder,
+                                                               @NonNull IdpAuthCredential credential ) {
+        SignInWithIdpRequest request = builder
                 .requestUri(credential.getRequestUri(this))
                 .postBody(credential.getPostBody())
                 .build();

@@ -56,7 +56,7 @@ public class FirebaseUser {
 
         if (credential instanceof IdpAuthCredential) {
             IdpAuthCredential idp = (IdpAuthCredential) credential;
-            return auth.signInWithCredential(idp);
+            return auth.linkWithCredential(this, idp);
         } else {
             String credentialClassName = credential.getClass().getSimpleName();
             String error = String.format("AuthCredential: %s not supported yet.", credentialClassName);

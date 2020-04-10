@@ -13,10 +13,12 @@ import androidx.appcompat.app.ActionBar;
 
 import com.anotherdev.firebase.auth.AuthError;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
+import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -142,7 +144,14 @@ public class LoginActivity extends BaseActivity {
             public void onSuccess(LoginResult loginResult) {
                 String token = loginResult.getAccessToken().getToken();
                 IdpAuthCredential credential = FacebookAuthProvider.getCredential(token);
-                onDestroy.add(firebaseAuth.signInWithCredential(credential)
+
+                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+
+                Single<SignInResponse> signInFlow = currentUser == null
+                        ? firebaseAuth.signInWithCredential(credential)
+                        : currentUser.linkWithCredential(credential);
+
+                onDestroy.add(signInFlow
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(e -> {
                             toast(e.getMessage());
@@ -158,7 +167,7 @@ public class LoginActivity extends BaseActivity {
                 v -> facebookLoginButton.performClick(),
                 auth -> {
                     boolean isLoggedOut = !auth.isSignedIn();
-                    signInWithFacebookButton.setEnabled(isLoggedOut);
+                    signInWithFacebookButton.setEnabled(true);
                     if (isLoggedOut) {
                         LoginManager.getInstance().logOut();
                     }

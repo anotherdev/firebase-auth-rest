@@ -33,15 +33,19 @@ public interface FirebaseAuth extends InternalAuthProvider {
 
     @NonNull
     @CheckReturnValue
-    Single<SignInResponse> createUserWithEmailAndPassword(String email, String password);
+    Single<SignInResponse> createUserWithEmailAndPassword(@NonNull String email, @NonNull String password);
 
     @NonNull
     @CheckReturnValue
-    Single<SignInResponse> signInWithEmailAndPassword(String email, String password);
+    Single<SignInResponse> signInWithEmailAndPassword(@NonNull String email, @NonNull String password);
 
     @NonNull
     @CheckReturnValue
-    Single<SignInResponse> signInWithCredential(IdpAuthCredential credential);
+    Single<SignInResponse> signInWithCredential(@NonNull IdpAuthCredential credential);
+
+    @NonNull
+    @CheckReturnValue
+    Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull IdpAuthCredential credential);
 
     void signOut();
 }
