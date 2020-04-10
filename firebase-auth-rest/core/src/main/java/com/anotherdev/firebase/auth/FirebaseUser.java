@@ -3,9 +3,16 @@ package com.anotherdev.firebase.auth;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.anotherdev.firebase.auth.common.FirebaseAuth;
+import com.anotherdev.firebase.auth.provider.AuthCredential;
+import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
+import com.google.firebase.FirebaseApp;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import io.reactivex.rxjava3.core.Single;
 
 @SuppressWarnings("WeakerAccess")
 public class FirebaseUser {
@@ -41,6 +48,20 @@ public class FirebaseUser {
     public String getUid() {
         JsonElement uid = userInfo.get("user_id");
         return uid != null ? uid.getAsString() : null;
+    }
+
+    public Single<SignInResponse> linkWithCredential(AuthCredential credential) {
+        FirebaseApp app = FirebaseApp.getInstance(appName);
+        FirebaseAuth auth = FirebaseAuthRest.getInstance(app);
+
+        if (credential instanceof IdpAuthCredential) {
+            IdpAuthCredential idp = (IdpAuthCredential) credential;
+            return auth.signInWithCredential(idp);
+        } else {
+            String credentialClassName = credential.getClass().getSimpleName();
+            String error = String.format("AuthCredential: %s not supported yet.", credentialClassName);
+            return Single.error(new UnsupportedOperationException(error));
+        }
     }
 
     public long getExpirationTime() {
