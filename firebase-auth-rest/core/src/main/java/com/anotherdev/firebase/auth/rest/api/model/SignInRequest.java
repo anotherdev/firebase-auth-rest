@@ -11,8 +11,8 @@ import org.immutables.value.Value;
 public interface SignInRequest {
 
     @Value.Default
-    @SerializedName("requestSecureToken")
-    default boolean requestSecureToken() {
+    @SerializedName("returnSecureToken")
+    default boolean returnSecureToken() {
         return true;
     }
 
