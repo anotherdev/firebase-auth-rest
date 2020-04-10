@@ -1,19 +1,27 @@
 package com.anotherdev.firebase.auth;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+@SuppressWarnings("WeakerAccess")
 public class FirebaseUser {
 
+    @NonNull
+    String appName;
+    @Nullable
     String idToken;
+    @Nullable
     String refreshToken;
+    @NonNull
     JsonObject userInfo;
 
 
-    FirebaseUser(String idToken, String refreshToken) {
+    FirebaseUser(@NonNull String appName, @Nullable String idToken, @Nullable String refreshToken) {
+        this.appName = appName;
         this.idToken = idToken;
         this.refreshToken = refreshToken;
         userInfo = IdTokenParser.parseIdToken(idToken);
@@ -48,7 +56,10 @@ public class FirebaseUser {
         return getExpirationTime() - (System.currentTimeMillis() / 1000);
     }
 
-    public static FirebaseUser from(String idToken, String refreshToken) {
-        return new FirebaseUser(idToken, refreshToken);
+
+    public static FirebaseUser from(@NonNull String appName,
+                                    @Nullable String idToken,
+                                    @Nullable String refreshToken) {
+        return new FirebaseUser(appName, idToken, refreshToken);
     }
 }

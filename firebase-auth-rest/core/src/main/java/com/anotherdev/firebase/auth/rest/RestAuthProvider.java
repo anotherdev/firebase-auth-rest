@@ -37,7 +37,7 @@ import timber.log.Timber;
 
 public class RestAuthProvider implements FirebaseAuth {
 
-    private static final FirebaseUser SIGNED_OUT = FirebaseUser.from(null, null);
+    private static final FirebaseUser SIGNED_OUT = FirebaseUser.from("SIGNED_OUT", null, null);
 
     private final FirebaseApp app;
     private final Preference<FirebaseUser> user;
@@ -178,7 +178,7 @@ public class RestAuthProvider implements FirebaseAuth {
     }
 
     private void saveCurrentUser(String idToken, String refreshToken) {
-        user.set(FirebaseUser.from(idToken, refreshToken));
+        user.set(FirebaseUser.from(app.getName(), idToken, refreshToken));
 
         for (IdTokenListener l : listeners) {
             l.onIdTokenChanged(new InternalTokenResult(idToken));
