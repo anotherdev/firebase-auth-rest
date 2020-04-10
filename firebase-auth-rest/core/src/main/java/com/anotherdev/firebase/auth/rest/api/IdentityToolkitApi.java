@@ -4,6 +4,7 @@ import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
 import com.google.gson.JsonObject;
 
 import io.reactivex.rxjava3.core.Single;
@@ -26,7 +27,7 @@ public interface IdentityToolkitApi {
     Single<SignInResponse> signInWithEmailAndPassword(@Body SignInWithEmailPasswordRequest request);
 
     @POST("v1/accounts:signInWithIdp")
-    Single<SignInResponse> signInWithCredential(@Body JsonObject request);
+    Single<SignInResponse> signInWithCredential(@Body SignInWithIdpRequest request);
 
     @POST("v1/accounts:lookup")
     Single<JsonObject> getAccounts(@Body IdTokenRequest request);

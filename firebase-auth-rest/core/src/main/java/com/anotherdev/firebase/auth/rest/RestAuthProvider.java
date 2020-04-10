@@ -12,6 +12,7 @@ import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.f2prateek.rx.preferences2.Preference;
@@ -22,7 +23,6 @@ import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.internal.IdTokenListener;
 import com.google.firebase.internal.InternalTokenResult;
 import com.google.firebase.internal.api.FirebaseNoSignedInUserException;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,13 +109,12 @@ public class RestAuthProvider implements FirebaseAuth {
     @NonNull
     @Override
     public Single<SignInResponse> signInWithCredential(AuthCredential credential) {
-        JsonObject json = new JsonObject();
-        json.addProperty("requestUri", credential.getRequestUri(this));
-        json.addProperty("postBody", credential.getPostBody());
-        json.addProperty("returnSecureToken", credential.returnSecureToken());
-        json.addProperty("returnIdpCredential", credential.returnIdpCredential());
+        SignInWithIdpRequest request = SignInWithIdpRequest.builder()
+                .requestUri(credential.getRequestUri(this))
+                .postBody(credential.getPostBody())
+                .build();
         return RestAuthApi.auth()
-                .signInWithCredential(json)
+                .signInWithCredential(request)
                 .map(saveAnonymousUser);
     }
 
@@ -178,7 +177,6 @@ public class RestAuthProvider implements FirebaseAuth {
         listeners.remove(idTokenListener);
     }
 
-
     private void saveCurrentUser(String idToken, String refreshToken) {
         user.set(FirebaseUser.from(idToken, refreshToken));
 
@@ -186,6 +184,7 @@ public class RestAuthProvider implements FirebaseAuth {
             l.onIdTokenChanged(new InternalTokenResult(idToken));
         }
     }
+
 
     private final Function<SignInResponse, SignInResponse> saveAnonymousUser = response -> {
         String idToken = response.getIdToken();
