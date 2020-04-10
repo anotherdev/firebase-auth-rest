@@ -32,26 +32,12 @@ public class MainActivity extends BaseActivity {
 
         Log.e("FAR", "auth.getUid(): " + auth.getUid());
         Log.e("FAR", "user: " + user);
-
-        /*if (user == null) {
-            auth.signInAnonymously()
-                    .doOnError(new Consumer<Throwable>() {
-                        @Override
-                        public void accept(Throwable e) throws Throwable {
-                            Log.e("FAR", "error", e);
-                        }
-                    })
-                    .onErrorComplete()
-                    .doOnSuccess(new Consumer<SignInAnonymouslyResponse>() {
-                        @Override
-                        public void accept(SignInAnonymouslyResponse response) throws Throwable {
-                            Log.e("FAR", "doOnSuccess: " + auth.getCurrentUser());
-                        }
-                    })
-                    .subscribe();
-        } else {
-            Log.e("FAR", "Already signed in: " + user);
-        }*/
+        if (user != null) {
+            Log.e("FAR", "uid: " + user.getUid());
+            Log.e("FAR", "expire: " + user.getExpirationTime());
+            Log.e("FAR", "id_token: " + user.getIdToken());
+            Log.e("FAR", "refresh_token: " + user.getRefreshToken());
+        }
 
         FirebaseDatabase.getInstance()
                 .getReference("test")
