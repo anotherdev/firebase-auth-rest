@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 
-class GoogleAuthCredential implements AuthCredential {
+class GoogleAuthCredential implements IdpAuthCredential {
 
     @Nullable
     private final String idToken;

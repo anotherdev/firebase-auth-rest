@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 
-class FacebookAuthCredential implements AuthCredential {
+class FacebookAuthCredential implements IdpAuthCredential {
 
     @NonNull
     private final String token;
