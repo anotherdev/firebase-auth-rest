@@ -11,7 +11,7 @@
         
         <service android:name="com.google.firebase.components.ComponentDiscoveryService">
             <meta-data
-                android:name="com.anotherdev.firebase.auth.rest.RestAuthComponentRegistrar"
+                android:name="com.google.firebase.components:com.anotherdev.firebase.auth.rest.RestAuthComponentRegistrar"
                 android:value="com.google.firebase.components.ComponentRegistrar" />
         </service>
 
