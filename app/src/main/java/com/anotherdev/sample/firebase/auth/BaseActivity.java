@@ -62,6 +62,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         onDestroy.add(hideGmsDialog());
     }
 
+    @Nullable
     protected Toolbar getToolbar() {
         return toolbar;
     }

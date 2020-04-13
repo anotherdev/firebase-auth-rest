@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
+import com.anotherdev.firebase.auth.util.RxUtil;
 import com.anotherdev.sample.firebase.auth.intent.LoginIntent;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
@@ -15,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
+import io.reactivex.rxjava3.internal.functions.Functions;
 import studio.carbonylgroup.textfieldboxes.ExtendedEditText;
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
@@ -28,6 +30,10 @@ public class MainActivity extends BaseActivity {
 
     @BindView(R.id.authenticated_tfb) TextFieldBoxes authenticatedTextFieldBoxes;
     @BindView(R.id.authenticated_eet) ExtendedEditText authenticatedEditText;
+
+    DatabaseReference privatePath;
+    DatabaseReference globalPublicPath;
+    DatabaseReference authenticatedPath;
 
     ValueEventListener privateListener;
     ValueEventListener globalPublicListener;
@@ -48,32 +54,38 @@ public class MainActivity extends BaseActivity {
         Log.i(TAG, String.valueOf(app));
 
         FirebaseDatabase rtdb = FirebaseDatabase.getInstance();
+        privatePath = rtdb.getReference("private");
+        globalPublicPath = rtdb.getReference("global_public");
+        authenticatedPath = rtdb.getReference("authenticated");
 
-        privateListener = rtdb.getReference("private")
+        privateListener = privatePath
                 .addValueEventListener(new FarValueEventListener(privateTextFieldBoxes, privateEditText));
-
-        DatabaseReference globalPublicPath = rtdb.getReference("global_public");
         globalPublicListener = globalPublicPath
                 .addValueEventListener(new FarValueEventListener(globalPublicTextFieldBoxes, globalPublicEditText));
-        globalPublicPath.setValue(System.currentTimeMillis());
 
-        DatabaseReference authenticatedPath = rtdb.getReference("authenticated");
+        onDestroy.add(FirebaseAuthRest.getInstance(app)
+                .authStateChanges()
+                .doOnNext(auth -> {
+                    Log.w(TAG, "authStateChanges() isSignedIn: " + auth.isSignedIn());
+                    rtdb.goOffline();
+                    rtdb.goOnline();
+                })
+                .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         authenticatedListener = authenticatedPath
                 .addValueEventListener(new FarValueEventListener(authenticatedTextFieldBoxes, authenticatedEditText));
+        globalPublicPath.setValue(System.currentTimeMillis());
         authenticatedPath.setValue(System.currentTimeMillis());
+    }
 
-
-        com.anotherdev.firebase.auth.common.FirebaseAuth auth = FirebaseAuthRest.getInstance(app);
-        com.anotherdev.firebase.auth.FirebaseUser user = auth.getCurrentUser();
-
-        Log.e("FAR", "auth.getUid(): " + auth.getUid());
-        Log.e("FAR", "user: " + user);
-        if (user != null) {
-            Log.e("FAR", "uid: " + user.getUid());
-            Log.e("FAR", "expire: " + user.getExpirationTime());
-            Log.e("FAR", "id_token: " + user.getIdToken());
-            Log.e("FAR", "refresh_token: " + user.getRefreshToken());
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        authenticatedPath.removeEventListener(authenticatedListener);
     }
 
     @Override
@@ -90,5 +102,12 @@ public class MainActivity extends BaseActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        privatePath.removeEventListener(privateListener);
+        globalPublicPath.removeEventListener(globalPublicListener);
     }
 }
