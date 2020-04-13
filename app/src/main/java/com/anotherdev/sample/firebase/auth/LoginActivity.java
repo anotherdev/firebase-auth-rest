@@ -4,14 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 
-import com.anotherdev.firebase.auth.AuthError;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
@@ -31,7 +29,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.FirebaseApp;
-import com.yarolegovich.lovelydialog.LovelyInfoDialog;
 
 import butterknife.BindView;
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
@@ -227,23 +224,5 @@ public class LoginActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         facebookCallbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void dialog(Throwable e) {
-        AuthError ae = AuthError.fromThrowable(e);
-        new LovelyInfoDialog(this)
-                .setTopColorRes(R.color.colorPrimary)
-                .setTopTitle("Error")
-                .setTopTitleColor(getResources().getColor(android.R.color.white))
-                .setMessage(String.format("code: %s\nmessage: %s\ncause: %s", ae.getCode(), ae.getMessage(), ae.getCause()))
-                .show();
-    }
-
-    private void toast(Throwable e) {
-        toast(AuthError.fromThrowable(e).toString());
-    }
-
-    private void toast(String text) {
-        Toast.makeText(LoginActivity.this, text, Toast.LENGTH_LONG).show();
     }
 }

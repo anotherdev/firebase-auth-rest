@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.LayoutRes;
@@ -13,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.anotherdev.firebase.auth.AuthError;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
@@ -21,6 +23,7 @@ import com.anotherdev.sample.firebase.auth.intent.LoginIntent;
 import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;
 import com.google.android.gms.common.SupportErrorDialogFragment;
 import com.google.firebase.FirebaseApp;
+import com.yarolegovich.lovelydialog.LovelyInfoDialog;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -128,6 +131,24 @@ public abstract class BaseActivity extends AppCompatActivity {
                             .request(new LoginIntent(this))
                             .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2)));
         }
+    }
+
+    protected void dialog(Throwable e) {
+        AuthError ae = AuthError.fromThrowable(e);
+        new LovelyInfoDialog(this)
+                .setTopColorRes(R.color.colorPrimary)
+                .setTopTitle("Error")
+                .setTopTitleColor(getResources().getColor(android.R.color.white))
+                .setMessage(String.format("code: %s\nmessage: %s\ncause: %s", ae.getCode(), ae.getMessage(), ae.getCause()))
+                .show();
+    }
+
+    protected void toast(Throwable e) {
+        toast(AuthError.fromThrowable(e).toString());
+    }
+
+    protected void toast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
     @Override
