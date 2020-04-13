@@ -41,6 +41,8 @@ dependencies {
 
     implementation "com.github.florent37:inline-activity-result-rx:1.0.3"
 
+    implementation "com.github.HITGIF:TextFieldBoxes:1.4.5"
+
     implementation "com.google.android.gms:play-services-auth:18.0.0"
 
     implementation "com.google.android.material:material:1.1.0"
