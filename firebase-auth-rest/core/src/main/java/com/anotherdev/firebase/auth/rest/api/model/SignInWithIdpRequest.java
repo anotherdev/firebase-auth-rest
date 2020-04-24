@@ -25,7 +25,7 @@ public interface SignInWithIdpRequest extends SignInRequest, IdTokenRequest {
     @Value.Default
     @SerializedName("returnIdpCredential")
     default boolean returnIdpCredential() {
-        return true;
+        return false;
     }
 
 
