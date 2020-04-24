@@ -202,10 +202,6 @@ public class RestAuthProvider implements FirebaseAuth {
 
 
     private final Function<SignInResponse, SignInResponse> saveAnonymousUser = response -> {
-        String incoming = response.getLocalId();
-        String local = getCurrentUser() != null ? getCurrentUser().getUid() : null;
-        Timber.e("local: %s incoming: %s", local, incoming);
-
         String idToken = response.getIdToken();
         String refreshToken = response.getRefreshToken();
         saveCurrentUser(idToken, refreshToken);
