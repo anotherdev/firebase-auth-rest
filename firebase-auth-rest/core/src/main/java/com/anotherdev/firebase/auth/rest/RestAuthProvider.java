@@ -1,5 +1,7 @@
 package com.anotherdev.firebase.auth.rest;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -20,6 +22,7 @@ import com.f2prateek.rx.preferences2.Preference;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.internal.IdTokenListener;
 import com.google.firebase.internal.InternalTokenResult;
@@ -151,12 +154,16 @@ public class RestAuthProvider implements FirebaseAuth {
         TaskCompletionSource<GetTokenResult> source = new TaskCompletionSource<>();
         FirebaseUser user = getCurrentUser();
         if (user != null) {
-            boolean needRefresh = forceRefresh || user.isExpired();
+            final boolean needRefresh = forceRefresh || user.isExpired();
+            final String currentRefreshToken = user.getRefreshToken();
             if (!needRefresh) {
                 source.trySetResult(getTokenResultLocal(user));
+            } else if (TextUtils.isEmpty(currentRefreshToken)) {
+                source.trySetException(new FirebaseException("Current refresh token is null. Log out"));
+                signOut();
             } else {
                 ExchangeTokenRequest request = ExchangeTokenRequest.builder()
-                        .refreshToken(user.getRefreshToken())
+                        .refreshToken(currentRefreshToken)
                         .build();
 
                 //noinspection ResultOfMethodCallIgnored
@@ -192,8 +199,13 @@ public class RestAuthProvider implements FirebaseAuth {
         listeners.remove(idTokenListener);
     }
 
-    private void saveCurrentUser(String idToken, String refreshToken) {
-        user.set(FirebaseUser.from(app.getName(), idToken, refreshToken));
+    private void saveCurrentUser(String idToken, String refreshToken) throws FirebaseException {
+        if (TextUtils.isEmpty(idToken) || TextUtils.isEmpty(refreshToken)) {
+            throw new FirebaseException(String.format("Input null. idToken: %s refreshToken: %s", idToken, refreshToken));
+        }
+
+        FirebaseUser user = FirebaseUser.from(app.getName(), idToken, refreshToken);
+        userStore.set(user);
 
         for (IdTokenListener l : listeners) {
             l.onIdTokenChanged(new InternalTokenResult(idToken));
