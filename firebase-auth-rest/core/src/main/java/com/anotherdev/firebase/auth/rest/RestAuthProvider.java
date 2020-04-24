@@ -41,14 +41,14 @@ public class RestAuthProvider implements FirebaseAuth {
     private static final FirebaseUser SIGNED_OUT = FirebaseUser.from("SIGNED_OUT", null, null);
 
     private final FirebaseApp app;
-    private final Preference<FirebaseUser> user;
+    private final Preference<FirebaseUser> userStore;
 
     private final List<IdTokenListener> listeners = new ArrayList<>();
 
 
     public RestAuthProvider(FirebaseApp app) {
         this.app = app;
-        user = Data.from(app.getApplicationContext()).getCurrentUser(SIGNED_OUT);
+        userStore = Data.from(app.getApplicationContext()).getCurrentUser(SIGNED_OUT);
     }
 
     @NonNull
@@ -60,18 +60,18 @@ public class RestAuthProvider implements FirebaseAuth {
     @Nullable
     @Override
     public FirebaseUser getCurrentUser() {
-        return user.isSet() ? user.get() : null;
+        return userStore.isSet() ? userStore.get() : null;
     }
 
     @Override
     public boolean isSignedIn() {
-        return user.isSet();
+        return userStore.isSet();
     }
 
     @NonNull
     @Override
     public Observable<FirebaseAuth> authStateChanges() {
-        return RxJavaBridge.toV3Observable(user.asObservable())
+        return RxJavaBridge.toV3Observable(userStore.asObservable())
                 .map(firebaseUser -> RestAuthProvider.this);
     }
 
@@ -135,7 +135,7 @@ public class RestAuthProvider implements FirebaseAuth {
 
     @Override
     public void signOut() {
-        user.delete();
+        userStore.delete();
     }
 
     private GetTokenResult getTokenResultLocal(@NonNull FirebaseUser user) {
@@ -179,7 +179,7 @@ public class RestAuthProvider implements FirebaseAuth {
     @Nullable
     @Override
     public String getUid() {
-        return user.get().getUid();
+        return userStore.get().getUid();
     }
 
     @Override
@@ -202,6 +202,10 @@ public class RestAuthProvider implements FirebaseAuth {
 
 
     private final Function<SignInResponse, SignInResponse> saveAnonymousUser = response -> {
+        String incoming = response.getLocalId();
+        String local = getCurrentUser() != null ? getCurrentUser().getUid() : null;
+        Timber.e("local: %s incoming: %s", local, incoming);
+
         String idToken = response.getIdToken();
         String refreshToken = response.getRefreshToken();
         saveCurrentUser(idToken, refreshToken);
