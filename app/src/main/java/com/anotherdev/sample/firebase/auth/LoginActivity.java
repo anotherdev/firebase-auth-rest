@@ -151,7 +151,7 @@ public class LoginActivity extends BaseActivity {
                 onDestroy.add(signInFlow
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(e -> {
-                            toast(e.getMessage());
+                            dialog(e);
                             LoginManager.getInstance().logOut();
                         })
                         .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
@@ -188,7 +188,7 @@ public class LoginActivity extends BaseActivity {
                                     return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
                                 })
                                 .doOnError(e -> {
-                                    toast(e.getMessage());
+                                    dialog(e);
                                     googleSignInClient.signOut();
                                 })
                                 .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2))),
