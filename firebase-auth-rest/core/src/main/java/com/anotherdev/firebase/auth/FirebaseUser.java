@@ -10,6 +10,8 @@ import io.reactivex.rxjava3.core.Single;
 
 public interface FirebaseUser {
 
+    boolean isSignedIn();
+
     @Nullable
     String getIdToken();
 

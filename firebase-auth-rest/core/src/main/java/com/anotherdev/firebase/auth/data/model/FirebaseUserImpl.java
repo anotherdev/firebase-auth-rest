@@ -1,5 +1,7 @@
 package com.anotherdev.firebase.auth.data.model;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -37,6 +39,11 @@ public class FirebaseUserImpl implements FirebaseUser {
         userInfo = IdTokenParser.parseIdToken(idToken);
     }
 
+    @Override
+    public boolean isSignedIn() {
+        return !TextUtils.isEmpty(idToken);
+    }
+
     @Nullable
     @Override
     public String getIdToken() {
@@ -68,7 +75,7 @@ public class FirebaseUserImpl implements FirebaseUser {
     @Nullable
     @Override
     public String getDisplayName() {
-        return null;
+        return getAsString("name");
     }
 
     @Nullable
