@@ -10,7 +10,10 @@ import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
+import com.anotherdev.firebase.auth.rest.api.model.ImmutableUserProfileChangeRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
+import com.anotherdev.firebase.auth.rest.api.model.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.google.firebase.FirebaseApp;
 import com.google.gson.JsonElement;
@@ -31,12 +34,17 @@ public class FirebaseUserImpl implements FirebaseUser {
     @NonNull
     JsonObject userInfo;
 
+    FirebaseApp app;
+    FirebaseAuth auth;
+
 
     FirebaseUserImpl(@NonNull String appName, @Nullable String idToken, @Nullable String refreshToken) {
         this.appName = appName;
         this.idToken = idToken;
         this.refreshToken = refreshToken;
         userInfo = IdTokenParser.parseIdToken(idToken);
+        app = FirebaseApp.getInstance(appName);
+        auth = FirebaseAuthRest.getInstance(app);
     }
 
     @Override
@@ -87,9 +95,6 @@ public class FirebaseUserImpl implements FirebaseUser {
     @NonNull
     @Override
     public Single<SignInResponse> linkWithCredential(AuthCredential credential) {
-        FirebaseApp app = FirebaseApp.getInstance(appName);
-        FirebaseAuth auth = FirebaseAuthRest.getInstance(app);
-
         if (credential instanceof IdpAuthCredential) {
             IdpAuthCredential idp = (IdpAuthCredential) credential;
             return auth.linkWithCredential(this, idp);
@@ -98,6 +103,15 @@ public class FirebaseUserImpl implements FirebaseUser {
             String error = String.format("AuthCredential: %s not supported yet.", credentialClassName);
             return Single.error(new UnsupportedOperationException(error));
         }
+    }
+
+    @NonNull
+    @Override
+    public Single<SignInResponse> updateProfile(UserProfileChangeRequest request) {
+        // TODO implement save returned updated data
+        return Single.just(ImmutableUserProfileChangeRequest.copyOf(request))
+                .map(req -> req.withIdToken(idToken))
+                .flatMap(req -> RestAuthApi.auth().updateProfile(req));
     }
 
     public long getExpirationTime() {
