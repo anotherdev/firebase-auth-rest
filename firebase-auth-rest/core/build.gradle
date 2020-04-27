@@ -89,6 +89,7 @@ dependencies {
 
     compileOnly "org.immutables:gson:$immutablesVersion"
     annotationProcessor "org.immutables:value:$immutablesVersion"
+    //noinspection AnnotationProcessorOnCompilePath
     compileOnly "org.immutables:value:$immutablesVersion"
 
     testImplementation "junit:junit:$junitVersion"
