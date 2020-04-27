@@ -20,8 +20,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/auth_user_info_layout"
+        android:orientation="vertical"
         android:layout_below="@id/auth_library_info_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/auth_user_info_textview"
+            android:layout_margin="16dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_below="@id/auth_user_info_layout"
         android:fillViewport="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

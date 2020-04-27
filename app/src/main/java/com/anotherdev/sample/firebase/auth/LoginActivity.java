@@ -41,6 +41,7 @@ import io.reactivex.rxjava3.internal.functions.Functions;
 public class LoginActivity extends BaseActivity {
 
     @BindView(R.id.auth_library_info_textview) TextView authLibraryTextView;
+    @BindView(R.id.auth_user_info_textview) TextView authUserTextView;
     @BindView(R.id.app_info_textview) TextView appInfoTextView;
 
     @BindView(R.id.auth_sign_in_anonymously_button) Button signInAnonymouslyButton;
@@ -53,6 +54,8 @@ public class LoginActivity extends BaseActivity {
 
     private final CallbackManager facebookCallbackManager = CallbackManager.Factory.create();
     private GoogleSignInClient googleSignInClient;
+
+    private FirebaseAuth firebaseAuth;
 
 
     @Override
@@ -70,10 +73,25 @@ public class LoginActivity extends BaseActivity {
 
         setResult(RESULT_OK);
 
+        firebaseAuth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
+
         String libInfo = String.format("Library: %s %s",
                 getString(com.anotherdev.firebase.auth.core.R.string.anotherdev_firebase_auth_rest_sdk_name),
                 com.anotherdev.firebase.auth.core.BuildConfig.VERSION_NAME);
         authLibraryTextView.setText(libInfo);
+
+        onDestroy.add(firebaseAuth.currentUser()
+                .doOnNext(user -> {
+                    String userInfo = "SIGNED OUT";
+                    if (user.isSignedIn()) {
+                        userInfo = String.format("UserId: %s\nEmail: %s\nDisplayName: %s",
+                                user.getUid(),
+                                user.getEmail(),
+                                user.getDisplayName());
+                    }
+                    authUserTextView.setText(userInfo);
+                })
+                .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
 
         String appInfo = String.format("%s\n%s", getString(R.string.app_title), BuildConfig.VERSION_NAME);
         appInfoTextView.setText(appInfo);
@@ -88,7 +106,6 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        FirebaseAuth firebaseAuth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
         setupSignInAnonymouslyButton(firebaseAuth);
         setupRegisterEmailButton(firebaseAuth);
         setupSignInWithEmailButton(firebaseAuth);
