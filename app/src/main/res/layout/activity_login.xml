@@ -11,70 +11,96 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:layout_marginTop="8dp"
+    <TextView
+        android:id="@+id/auth_library_info_button"
+        android:text="@string/app_title"
+        android:layout_margin="16dp"
         android:layout_below="@id/toolbar"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_below="@id/auth_library_info_button"
+        android:fillViewport="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/auth_sign_in_anonymously_button"
-            android:text="@string/sign_in_anonymously"
-            android:layout_margin="8dp"
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="bottom"
+            android:padding="8dp"
+            android:layout_marginTop="8dp"
             android:layout_width="match_parent"
-            android:layout_height="@android:dimen/app_icon_size" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/auth_register_email_button"
-            android:text="@string/register_email_password"
-            android:layout_margin="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="@android:dimen/app_icon_size" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/auth_sign_in_email_button"
-            android:text="@string/sign_in__with_email"
-            android:layout_margin="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="@android:dimen/app_icon_size" />
-
-        <RelativeLayout
-            android:layout_margin="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="@android:dimen/app_icon_size">
-
-            <com.facebook.login.widget.LoginButton
-                android:id="@+id/auth_facebook_button"
-                android:visibility="gone"
-                android:layout_margin="4dp"
-                android:layout_centerInParent="true"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+            android:layout_height="wrap_content">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/auth_sign_in_with_facebook_button"
-                android:text="@string/sign_in__with_facebook"
+                android:id="@+id/auth_sign_in_anonymously_button"
+                android:text="@string/sign_in_anonymously"
+                android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="@android:dimen/app_icon_size" />
 
-        </RelativeLayout>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/auth_register_email_button"
+                android:text="@string/register_email_password"
+                android:layout_margin="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="@android:dimen/app_icon_size" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/auth_sign_in_with_google_button"
-            android:text="@string/sign_in__with_google"
-            android:layout_margin="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="@android:dimen/app_icon_size" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/auth_sign_in_email_button"
+                android:text="@string/sign_in__with_email"
+                android:layout_margin="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="@android:dimen/app_icon_size" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/auth_logout_button"
-            android:text="@string/log_out"
-            android:layout_margin="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="@android:dimen/app_icon_size" />
+            <RelativeLayout
+                android:layout_margin="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="@android:dimen/app_icon_size">
 
-    </LinearLayout>
+                <com.facebook.login.widget.LoginButton
+                    android:id="@+id/auth_facebook_button"
+                    android:visibility="gone"
+                    android:layout_margin="4dp"
+                    android:layout_centerInParent="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/auth_sign_in_with_facebook_button"
+                    android:text="@string/sign_in__with_facebook"
+                    android:layout_width="match_parent"
+                    android:layout_height="@android:dimen/app_icon_size" />
+
+            </RelativeLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/auth_sign_in_with_google_button"
+                android:text="@string/sign_in__with_google"
+                android:layout_margin="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="@android:dimen/app_icon_size" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/auth_logout_button"
+                android:text="@string/log_out"
+                android:layout_margin="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="@android:dimen/app_icon_size" />
+
+            <TextView
+                android:id="@+id/app_info_button"
+                android:text="@string/app_title"
+                android:gravity="center_horizontal"
+                android:paddingBottom="16dp"
+                android:layout_margin="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </RelativeLayout>
