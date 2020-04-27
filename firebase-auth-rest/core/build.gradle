@@ -1,9 +1,45 @@
 apply plugin: 'com.android.library'
 
+static def gitSha() {
+    return 'git rev-parse --short HEAD'.execute().text.trim()
+}
+
+static def gitCommitHash() {
+    return 'git rev-parse HEAD'.execute().text.trim()
+}
+
+static def gitBranch() {
+    return 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+}
+
+static def buildTime() {
+    return (new Date().getTime() / 1000).toInteger()
+}
+
+static def wrapString(aString) {
+    return '"' + aString + '"'
+}
+
+static def wrapBoolean(value) {
+    return "Boolean.parseBoolean(" + wrapString(value) + ")"
+}
+
+static def wrapInteger(value) {
+    return "" + value + ""
+}
+
 android {
+    def GIT_SHA = "GIT_SHA"
+    def GIT_COMMIT_HASH = "GIT_COMMIT_HASH"
+    def GIT_BRANCH = "GIT_BRANCH"
+
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
+        buildConfigField 'String', GIT_SHA, wrapString(gitSha())
+        buildConfigField 'String', GIT_COMMIT_HASH, wrapString(gitCommitHash())
+        buildConfigField 'String', GIT_BRANCH, wrapString(gitBranch())
+
         minSdkVersion rootProject.ext.minSdkVersionFirebaseAuthRest
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.fullVersionCode
