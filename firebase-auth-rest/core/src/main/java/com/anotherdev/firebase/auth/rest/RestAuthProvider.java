@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.FirebaseUser;
+import com.anotherdev.firebase.auth.FirebaseUserImpl;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
@@ -41,10 +42,10 @@ import timber.log.Timber;
 
 public class RestAuthProvider implements FirebaseAuth {
 
-    private static final FirebaseUser SIGNED_OUT = FirebaseUser.from("SIGNED_OUT", null, null);
+    private static final FirebaseUserImpl SIGNED_OUT = FirebaseUserImpl.from("SIGNED_OUT", null, null);
 
     private final FirebaseApp app;
-    private final Preference<FirebaseUser> userStore;
+    private final Preference<FirebaseUserImpl> userStore;
 
     private final List<IdTokenListener> listeners = new ArrayList<>();
 
@@ -62,7 +63,7 @@ public class RestAuthProvider implements FirebaseAuth {
 
     @Nullable
     @Override
-    public FirebaseUser getCurrentUser() {
+    public FirebaseUserImpl getCurrentUser() {
         return userStore.isSet() ? userStore.get() : null;
     }
 
@@ -141,7 +142,7 @@ public class RestAuthProvider implements FirebaseAuth {
         userStore.delete();
     }
 
-    private GetTokenResult getTokenResultLocal(@NonNull FirebaseUser user) {
+    private GetTokenResult getTokenResultLocal(@NonNull FirebaseUserImpl user) {
         String idToken = user.getIdToken();
         Map<String, Object> map = IdTokenParser.parseIdTokenToMap(idToken);
         return new GetTokenResult(idToken, map);
@@ -152,7 +153,7 @@ public class RestAuthProvider implements FirebaseAuth {
     public Task<GetTokenResult> getAccessToken(boolean forceRefresh) {
         Timber.d("getAccessToken(%s)", forceRefresh);
         TaskCompletionSource<GetTokenResult> source = new TaskCompletionSource<>();
-        FirebaseUser user = getCurrentUser();
+        FirebaseUserImpl user = getCurrentUser();
         if (user != null) {
             final boolean needRefresh = forceRefresh || user.isExpired();
             final String currentRefreshToken = user.getRefreshToken();
@@ -204,7 +205,7 @@ public class RestAuthProvider implements FirebaseAuth {
             throw new FirebaseException(String.format("Input null. idToken: %s refreshToken: %s", idToken, refreshToken));
         }
 
-        FirebaseUser user = FirebaseUser.from(app.getName(), idToken, refreshToken);
+        FirebaseUserImpl user = FirebaseUserImpl.from(app.getName(), idToken, refreshToken);
         userStore.set(user);
 
         for (IdTokenListener l : listeners) {

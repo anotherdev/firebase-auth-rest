@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 
-import com.anotherdev.firebase.auth.FirebaseUser;
+import com.anotherdev.firebase.auth.FirebaseUserImpl;
 import com.anotherdev.firebase.auth.util.FarGson;
 import com.f2prateek.rx.preferences2.Preference;
 import com.f2prateek.rx.preferences2.RxSharedPreferences;
@@ -28,20 +28,20 @@ public class Data {
         return rxSharedPreferences.getString("google_api_key", "");
     }
 
-    public Preference<FirebaseUser> getCurrentUser(@NonNull FirebaseUser defaultValue) {
+    public Preference<FirebaseUserImpl> getCurrentUser(@NonNull FirebaseUserImpl defaultValue) {
         return rxSharedPreferences.getObject(
                 "current_user_info",
                 defaultValue,
-                new Preference.Converter<FirebaseUser>() {
+                new Preference.Converter<FirebaseUserImpl>() {
                     @NonNull
                     @Override
-                    public FirebaseUser deserialize(@NonNull String json) {
-                        return GSON.fromJson(json, FirebaseUser.class);
+                    public FirebaseUserImpl deserialize(@NonNull String json) {
+                        return GSON.fromJson(json, FirebaseUserImpl.class);
                     }
 
                     @NonNull
                     @Override
-                    public String serialize(@NonNull FirebaseUser user) {
+                    public String serialize(@NonNull FirebaseUserImpl user) {
                         return GSON.toJson(user);
                     }
                 });

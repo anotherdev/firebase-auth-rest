@@ -8,7 +8,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
-import com.anotherdev.firebase.auth.common.FirebaseAuth;
+import com.anotherdev.firebase.auth.rest.RestAuthProvider;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.internal.IdTokenListener;
 import com.google.firebase.internal.InternalTokenResult;
@@ -26,7 +26,7 @@ public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserve
     private static final long MAX_RETRY_BACKOFF = MILLISECONDS.convert(5, MINUTES);
 
     private final Handler handler = new Handler();
-    private final FirebaseAuth auth;
+    private final RestAuthProvider auth;
 
     private String ownerName;
 
@@ -34,7 +34,7 @@ public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserve
     private String lastToken;
 
 
-    public RestAuthTokenRefresher(FirebaseAuth auth) {
+    public RestAuthTokenRefresher(RestAuthProvider auth) {
         this.auth = auth;
     }
 
@@ -80,7 +80,7 @@ public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserve
     private final Runnable refreshRunnable = new Runnable() {
         @Override
         public void run() {
-            FirebaseUser user = auth.getCurrentUser();
+            FirebaseUserImpl user = auth.getCurrentUser();
             if (user == null) {
                 Timber.d("User signed out, nothing to refresh.");
                 return;

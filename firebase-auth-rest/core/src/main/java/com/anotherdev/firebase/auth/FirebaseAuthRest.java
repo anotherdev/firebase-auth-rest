@@ -18,7 +18,7 @@ public class FirebaseAuthRest {
 
     public static FirebaseAuth getInstance(FirebaseApp app) {
         final String name = app.getName();
-        final FirebaseAuth auth = new RestAuthProvider(app);
+        final RestAuthProvider auth = new RestAuthProvider(app);
         if (!TOKEN_REFRESHER_MAP.containsKey(name)) {
             TOKEN_REFRESHER_MAP.put(name, new RestAuthTokenRefresher(auth));
         }
