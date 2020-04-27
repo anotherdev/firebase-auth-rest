@@ -9,7 +9,6 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
 import com.anotherdev.firebase.auth.data.model.FirebaseUserImpl;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.internal.IdTokenListener;
 import com.google.firebase.internal.InternalTokenResult;
 
@@ -105,15 +104,12 @@ public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserve
                         // Clear the failure backoff
                         failureRetryTimeMillis = MIN_RETRY_BACKOFF;
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Timber.e(e, "Failed to refresh token.");
-                            Timber.d("Retrying in %s...", failureRetryTimeMillis);
-                            // Retry and double the backoff time (up to the max)
-                            handler.postDelayed(refreshRunnable, failureRetryTimeMillis);
-                            failureRetryTimeMillis = Math.min(failureRetryTimeMillis * 2, MAX_RETRY_BACKOFF);
-                        }
+                    .addOnFailureListener(e -> {
+                        Timber.e(e, "Failed to refresh token.");
+                        Timber.d("Retrying in %s...", failureRetryTimeMillis);
+                        // Retry and double the backoff time (up to the max)
+                        handler.postDelayed(refreshRunnable, failureRetryTimeMillis);
+                        failureRetryTimeMillis = Math.min(failureRetryTimeMillis * 2, MAX_RETRY_BACKOFF);
                     });
         }
     };
