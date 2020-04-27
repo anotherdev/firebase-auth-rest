@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +40,9 @@ import io.reactivex.rxjava3.internal.functions.Functions;
 
 public class LoginActivity extends BaseActivity {
 
+    @BindView(R.id.auth_library_info_textview) TextView authLibraryTextView;
+    @BindView(R.id.app_info_textview) TextView appInfoTextView;
+
     @BindView(R.id.auth_sign_in_anonymously_button) Button signInAnonymouslyButton;
     @BindView(R.id.auth_register_email_button) Button registerEmailButton;
     @BindView(R.id.auth_sign_in_email_button) Button signInWithEmailButton;
@@ -65,6 +69,14 @@ public class LoginActivity extends BaseActivity {
         }
 
         setResult(RESULT_OK);
+
+        String libInfo = String.format("Library: %s %s",
+                getString(com.anotherdev.firebase.auth.core.R.string.anotherdev_firebase_auth_rest_sdk_name),
+                com.anotherdev.firebase.auth.core.BuildConfig.VERSION_NAME);
+        authLibraryTextView.setText(libInfo);
+
+        String appInfo = String.format("%s\n%s", getString(R.string.app_title), BuildConfig.VERSION_NAME);
+        appInfoTextView.setText(appInfo);
 
         googleSignInClient = GoogleSignIn.getClient(this,
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
