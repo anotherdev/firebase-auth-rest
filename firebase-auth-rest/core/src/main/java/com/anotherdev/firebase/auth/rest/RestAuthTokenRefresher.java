@@ -8,7 +8,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
-import com.anotherdev.firebase.auth.FirebaseUserImpl;
+import com.anotherdev.firebase.auth.data.model.FirebaseUserImpl;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.internal.IdTokenListener;
 import com.google.firebase.internal.InternalTokenResult;

@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.FirebaseUser;
-import com.anotherdev.firebase.auth.FirebaseUserImpl;
+import com.anotherdev.firebase.auth.data.model.FirebaseUserImpl;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;

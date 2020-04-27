@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 
-import com.anotherdev.firebase.auth.FirebaseUserImpl;
+import com.anotherdev.firebase.auth.data.model.FirebaseUserImpl;
 import com.anotherdev.firebase.auth.util.FarGson;
 import com.f2prateek.rx.preferences2.Preference;
 import com.f2prateek.rx.preferences2.RxSharedPreferences;
