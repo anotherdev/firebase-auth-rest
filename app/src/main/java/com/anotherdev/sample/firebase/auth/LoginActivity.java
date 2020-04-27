@@ -229,6 +229,7 @@ public class LoginActivity extends BaseActivity {
             onClick.onClick(v);
         });
         onDestroy.add(firebaseAuth.authStateChanges()
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(authStateConsumer, RxUtil.ON_ERROR_LOG_V3));
     }
 
