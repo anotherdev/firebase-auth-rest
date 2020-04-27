@@ -15,6 +15,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.reactivex.rxjava3.core.Single;
+import timber.log.Timber;
 
 @SuppressWarnings("WeakerAccess")
 public class FirebaseUserImpl implements FirebaseUser {
@@ -45,6 +46,17 @@ public class FirebaseUserImpl implements FirebaseUser {
     @Nullable
     public String getRefreshToken() {
         return refreshToken;
+    }
+
+    @Nullable
+    private String getAsString(String key) {
+        try {
+            JsonElement element = userInfo.get(key);
+            return element != null ? element.getAsString() : null;
+        } catch (RuntimeException e) {
+            Timber.e(e);
+            return null;
+        }
     }
 
     @Nullable
