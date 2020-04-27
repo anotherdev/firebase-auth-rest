@@ -12,7 +12,7 @@
         android:layout_height="wrap_content" />
 
     <TextView
-        android:id="@+id/auth_library_info_button"
+        android:id="@+id/auth_library_info_textview"
         android:text="@string/app_title"
         android:layout_margin="16dp"
         android:layout_below="@id/toolbar"
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content" />
 
     <ScrollView
-        android:layout_below="@id/auth_library_info_button"
+        android:layout_below="@id/auth_library_info_textview"
         android:fillViewport="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -91,7 +91,7 @@
                 android:layout_height="@android:dimen/app_icon_size" />
 
             <TextView
-                android:id="@+id/app_info_button"
+                android:id="@+id/app_info_textview"
                 android:text="@string/app_title"
                 android:gravity="center_horizontal"
                 android:paddingBottom="16dp"
