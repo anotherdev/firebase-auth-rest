@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
-import com.anotherdev.firebase.auth.RestAuthTokenRefresher;
+import com.anotherdev.firebase.auth.rest.RestAuthTokenRefresher;
 import com.anotherdev.firebase.auth.core.BaseActivityLifecycleCallbacks;
 import com.anotherdev.firebase.auth.core.BaseInitProvider;
 import com.anotherdev.firebase.auth.core.R;

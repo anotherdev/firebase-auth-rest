@@ -73,7 +73,7 @@ public class FirebaseUserImpl implements FirebaseUser {
         return expiresInSeconds() <= 0;
     }
 
-    long expiresInSeconds() {
+    public long expiresInSeconds() {
         return getExpirationTime() - (System.currentTimeMillis() / 1000);
     }
 
