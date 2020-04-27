@@ -83,7 +83,7 @@ public class RestAuthProvider implements FirebaseAuth {
     public Single<SignInResponse> signInAnonymously() {
         return RestAuthApi.auth()
                 .signInAnonymously(SignInRequest.builder().build())
-                .map(saveAnonymousUser);
+                .map(saveSignedInUser);
     }
 
     @NonNull
@@ -95,7 +95,7 @@ public class RestAuthProvider implements FirebaseAuth {
                 .build();
         return RestAuthApi.auth()
                 .createUserWithEmailAndPassword(request)
-                .map(saveAnonymousUser);
+                .map(saveSignedInUser);
     }
 
     @NonNull
@@ -107,7 +107,7 @@ public class RestAuthProvider implements FirebaseAuth {
                 .build();
         return RestAuthApi.auth()
                 .signInWithEmailAndPassword(request)
-                .map(saveAnonymousUser);
+                .map(saveSignedInUser);
     }
 
     @NonNull
@@ -133,7 +133,7 @@ public class RestAuthProvider implements FirebaseAuth {
                 .build();
         return RestAuthApi.auth()
                 .signInWithCredential(request)
-                .map(saveAnonymousUser);
+                .map(saveSignedInUser);
     }
 
     @Override
@@ -213,7 +213,7 @@ public class RestAuthProvider implements FirebaseAuth {
     }
 
 
-    private final Function<SignInResponse, SignInResponse> saveAnonymousUser = response -> {
+    private final Function<SignInResponse, SignInResponse> saveSignedInUser = response -> {
         String idToken = response.getIdToken();
         String refreshToken = response.getRefreshToken();
         saveCurrentUser(idToken, refreshToken);
