@@ -67,6 +67,12 @@ public class RestAuthProvider implements FirebaseAuth {
         return userStore.isSet() ? userStore.get() : null;
     }
 
+    @NonNull
+    @Override
+    public Observable<FirebaseUser> currentUser() {
+        return RxJavaBridge.toV3Observable(userStore.asObservable().map(user -> user));
+    }
+
     @Override
     public boolean isSignedIn() {
         return userStore.isSet();
