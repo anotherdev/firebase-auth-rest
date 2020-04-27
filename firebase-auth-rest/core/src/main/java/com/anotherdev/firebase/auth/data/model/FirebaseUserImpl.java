@@ -37,6 +37,7 @@ public class FirebaseUserImpl implements FirebaseUser {
     }
 
     @Nullable
+    @Override
     public String getIdToken() {
         return idToken;
     }
@@ -47,11 +48,14 @@ public class FirebaseUserImpl implements FirebaseUser {
     }
 
     @Nullable
+    @Override
     public String getUid() {
         JsonElement uid = userInfo.get("user_id");
         return uid != null ? uid.getAsString() : null;
     }
 
+    @NonNull
+    @Override
     public Single<SignInResponse> linkWithCredential(AuthCredential credential) {
         FirebaseApp app = FirebaseApp.getInstance(appName);
         FirebaseAuth auth = FirebaseAuthRest.getInstance(app);
