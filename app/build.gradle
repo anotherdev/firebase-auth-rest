@@ -2,6 +2,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    def APP_NAME = "FAuth REST API"
+    def APP_TITLE = "Firebase Auth REST API"
+
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
@@ -10,6 +13,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
+
+        resValue "string", "app_name", APP_NAME
+        resValue "string", "app_title", APP_TITLE
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -22,6 +28,9 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix " - " + defaultConfig.versionCode + " DEBUG"
+
+            resValue "string", "app_name", "Debug " + APP_NAME
+            resValue "string", "app_title", "Debug " + APP_TITLE
         }
     }
 

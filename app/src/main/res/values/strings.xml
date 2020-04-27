@@ -1,7 +1,5 @@
 <resources>
 
-    <string name="app_name">Firebase Auth REST API</string>
-
     <string name="accounts">Accounts</string>
     <string name="email">Email</string>
     <string name="password">Password</string>

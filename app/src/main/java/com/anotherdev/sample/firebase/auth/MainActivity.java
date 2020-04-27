@@ -49,6 +49,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestAuthIfNeeded();
+        setTitle(R.string.app_title);
 
         FirebaseApp app = FirebaseApp.getInstance();
         Log.i(TAG, String.valueOf(app));
