@@ -15,13 +15,12 @@ public class Data {
 
     private static final Gson GSON = FarGson.get();
 
-    private final SharedPreferences sharedPreferences;
     private final RxSharedPreferences rxSharedPreferences;
 
 
     private Data(Context context) {
-        sharedPreferences = context.getSharedPreferences(Data.class.getName(), Context.MODE_PRIVATE);
-        rxSharedPreferences = RxSharedPreferences.create(sharedPreferences);
+        SharedPreferences pref = context.getSharedPreferences(Data.class.getName(), Context.MODE_PRIVATE);
+        rxSharedPreferences = RxSharedPreferences.create(pref);
     }
 
     public Preference<String> getApiKey() {
