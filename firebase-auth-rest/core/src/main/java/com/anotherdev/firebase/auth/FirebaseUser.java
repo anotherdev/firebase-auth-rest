@@ -16,6 +16,12 @@ public interface FirebaseUser {
     @Nullable
     String getUid();
 
+    @Nullable
+    String getDisplayName();
+
+    @Nullable
+    String getEmail();
+
     @NonNull
     Single<SignInResponse> linkWithCredential(AuthCredential credential);
 }

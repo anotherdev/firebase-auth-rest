@@ -62,8 +62,19 @@ public class FirebaseUserImpl implements FirebaseUser {
     @Nullable
     @Override
     public String getUid() {
-        JsonElement uid = userInfo.get("user_id");
-        return uid != null ? uid.getAsString() : null;
+        return getAsString("user_id");
+    }
+
+    @Nullable
+    @Override
+    public String getDisplayName() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public String getEmail() {
+        return getAsString("email");
     }
 
     @NonNull
