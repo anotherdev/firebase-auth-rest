@@ -44,7 +44,36 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "167992156616-d4vbak80e6q7e408ileodu0jpk1914j6.apps.googleusercontent.com",
+              "client_id": "167992156616-rvn658jpplrpktl3n3dvs0sq9edu3u73.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:167992156616:android:d3f72ea442338ff1d8a0fd",
+        "android_client_info": {
+          "package_name": "com.anotherdev.sample.firebase.auth.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "167992156616-d4vbak80e6q7e408ileodu0jpk1914j6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz2SCXhveewkkuEC0fu4AiPFfHifeDHNE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "167992156616-rvn658jpplrpktl3n3dvs0sq9edu3u73.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
