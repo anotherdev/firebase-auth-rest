@@ -2,7 +2,7 @@ package com.anotherdev.firebase.auth;
 
 import androidx.annotation.Nullable;
 
-import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
+import com.anotherdev.firebase.auth.rest.api.model.OptionalIdTokenRequest;
 import com.google.gson.annotations.SerializedName;
 
 import org.immutables.gson.Gson;
@@ -13,16 +13,12 @@ import java.util.List;
 @Value.Immutable
 @Value.Style(strictBuilder = true)
 @Gson.TypeAdapters
-public interface UserProfileChangeRequest extends IdTokenRequest {
+public interface UserProfileChangeRequest extends OptionalIdTokenRequest {
 
     enum Attribute {
         DISPLAY_NAME,
         PHOTO_URL
     }
-
-    @Nullable
-    @Override
-    String getIdToken();
 
     @Nullable
     @SerializedName("displayName")
