@@ -13,11 +13,11 @@ import androidx.appcompat.app.ActionBar;
 
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
+import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
-import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;

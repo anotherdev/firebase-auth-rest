@@ -1,5 +1,6 @@
-package com.anotherdev.firebase.auth.rest.api.model;
+package com.anotherdev.firebase.auth;
 
+@SuppressWarnings("WeakerAccess")
 public class SignInResponse {
 
     String idToken;

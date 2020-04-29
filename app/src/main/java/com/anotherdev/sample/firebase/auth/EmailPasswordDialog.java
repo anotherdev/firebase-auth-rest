@@ -7,11 +7,12 @@ import android.widget.TextView;
 
 import androidx.annotation.StringRes;
 
-import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
+import com.anotherdev.firebase.auth.SignInResponse;
 import com.yarolegovich.lovelydialog.LovelyCustomDialog;
 
 import io.reactivex.rxjava3.core.Single;
 
+@SuppressWarnings("WeakerAccess")
 public class EmailPasswordDialog extends LovelyCustomDialog {
 
     public interface OnConfirmClickListener {

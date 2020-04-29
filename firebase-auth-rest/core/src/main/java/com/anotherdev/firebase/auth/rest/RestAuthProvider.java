@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.FirebaseUser;
+import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.data.model.FirebaseUserImpl;
@@ -14,7 +15,6 @@ import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithIdpRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
-import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
