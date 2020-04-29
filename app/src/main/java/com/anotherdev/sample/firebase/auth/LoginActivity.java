@@ -118,6 +118,7 @@ public class LoginActivity extends BaseActivity {
         setupButton(firebaseAuth,
                 signInAnonymouslyButton,
                 v -> onDestroy.add(firebaseAuth.signInAnonymously()
+                        .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(this::dialog)
                         .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3)),
                 auth -> signInAnonymouslyButton.setEnabled(!auth.isSignedIn()));
