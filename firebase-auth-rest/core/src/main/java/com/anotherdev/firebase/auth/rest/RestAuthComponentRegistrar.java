@@ -25,7 +25,7 @@ public class RestAuthComponentRegistrar implements ComponentRegistrar {
                 .factory(container -> {
                     FirebaseApp app = container.get(firebaseAppClass);
                     Timber.i("create auth provider: %s for app: %s", authProviderClass, app);
-                    return FirebaseAuthRest.getInstance(app);
+                    return (InternalAuthProvider) FirebaseAuthRest.getInstance(app);
                 })
                 .build();
         return Collections.singletonList(component);
