@@ -1,10 +1,8 @@
-package com.anotherdev.firebase.auth.common;
+package com.anotherdev.firebase.auth;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.anotherdev.firebase.auth.FirebaseUser;
-import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.google.firebase.FirebaseApp;
 

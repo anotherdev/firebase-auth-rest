@@ -15,9 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.anotherdev.firebase.auth.AuthError;
+import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
-import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.anotherdev.sample.firebase.auth.intent.LoginIntent;
 import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;

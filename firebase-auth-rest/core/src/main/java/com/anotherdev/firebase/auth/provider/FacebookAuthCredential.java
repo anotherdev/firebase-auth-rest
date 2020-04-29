@@ -2,7 +2,7 @@ package com.anotherdev.firebase.auth.provider;
 
 import androidx.annotation.NonNull;
 
-import com.anotherdev.firebase.auth.common.FirebaseAuth;
+import com.anotherdev.firebase.auth.FirebaseAuth;
 
 class FacebookAuthCredential implements IdpAuthCredential {
 

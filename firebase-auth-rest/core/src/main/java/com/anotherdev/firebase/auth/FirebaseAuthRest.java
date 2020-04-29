@@ -1,6 +1,5 @@
 package com.anotherdev.firebase.auth;
 
-import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.rest.RestAuthProvider;
 import com.anotherdev.firebase.auth.rest.RestAuthTokenRefresher;
 import com.google.firebase.FirebaseApp;

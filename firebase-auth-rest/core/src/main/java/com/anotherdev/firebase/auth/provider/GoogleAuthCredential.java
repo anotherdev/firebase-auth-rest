@@ -3,7 +3,7 @@ package com.anotherdev.firebase.auth.provider;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.anotherdev.firebase.auth.common.FirebaseAuth;
+import com.anotherdev.firebase.auth.FirebaseAuth;
 
 class GoogleAuthCredential implements IdpAuthCredential {
 
