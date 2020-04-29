@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    def APP_NAME = "FAuth REST API"
+    def APP_NAME = "AuthRest"
     def APP_TITLE = "Firebase Auth REST API"
 
     compileSdkVersion rootProject.ext.compileSdkVersion
