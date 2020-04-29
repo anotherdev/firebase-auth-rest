@@ -28,6 +28,9 @@ public interface FirebaseUser {
     Single<SignInResponse> linkWithCredential(@NonNull AuthCredential credential);
 
     @NonNull
+    Single<SignInResponse> reauthenticate(@NonNull AuthCredential credential);
+
+    @NonNull
     Completable updateProfile(@NonNull UserProfileChangeRequest request);
 
     @NonNull

@@ -12,6 +12,7 @@ import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
+import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.RestAuthProvider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
@@ -115,6 +116,22 @@ public class FirebaseUserImpl implements FirebaseUser {
         if (credential instanceof IdpAuthCredential) {
             IdpAuthCredential idp = (IdpAuthCredential) credential;
             return getAuth().linkWithCredential(this, idp);
+        } else {
+            String credentialClassName = credential.getClass().getSimpleName();
+            String error = String.format("AuthCredential: %s not supported yet.", credentialClassName);
+            return Single.error(new UnsupportedOperationException(error));
+        }
+    }
+
+    @NonNull
+    @Override
+    public Single<SignInResponse> reauthenticate(@NonNull AuthCredential credential) {
+        FirebaseAuth auth = getAuth();
+        if (credential instanceof  IdpAuthCredential) {
+            return auth.signInWithCredential((IdpAuthCredential) credential);
+        } else if (credential instanceof EmailAuthCredential) {
+            EmailAuthCredential eac = (EmailAuthCredential) credential;
+            return auth.signInWithEmailAndPassword(eac.getEmail(), eac.getPassword());
         } else {
             String credentialClassName = credential.getClass().getSimpleName();
             String error = String.format("AuthCredential: %s not supported yet.", credentialClassName);
