@@ -37,7 +37,6 @@ import java.util.Map;
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.internal.functions.Functions;
 import timber.log.Timber;
 
@@ -91,7 +90,7 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     public Single<SignInResponse> signInAnonymously() {
         return RestAuthApi.auth()
                 .signInAnonymously(SignInAnonymouslyRequest.builder().build())
-                .map(saveSignedInUser);
+                .map(this::saveCurrentUser);
     }
 
     @NonNull
@@ -103,7 +102,7 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 .build();
         return RestAuthApi.auth()
                 .createUserWithEmailAndPassword(request)
-                .map(saveSignedInUser);
+                .map(this::saveCurrentUser);
     }
 
     @NonNull
@@ -115,7 +114,7 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 .build();
         return RestAuthApi.auth()
                 .signInWithEmailAndPassword(request)
-                .map(saveSignedInUser);
+                .map(this::saveCurrentUser);
     }
 
     @NonNull
@@ -141,7 +140,7 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 .build();
         return RestAuthApi.auth()
                 .signInWithCredential(request)
-                .map(saveSignedInUser);
+                .map(this::saveCurrentUser);
     }
 
     @Override
@@ -207,6 +206,13 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
         listeners.remove(idTokenListener);
     }
 
+    public SignInResponse saveCurrentUser(SignInResponse response) throws FirebaseException {
+        String idToken = response.getIdToken();
+        String refreshToken = response.getRefreshToken();
+        saveCurrentUser(idToken, refreshToken);
+        return response;
+    }
+
     private void saveCurrentUser(String idToken, String refreshToken) throws FirebaseException {
         if (TextUtils.isEmpty(idToken) || TextUtils.isEmpty(refreshToken)) {
             throw new FirebaseException(String.format("Input null. idToken: %s refreshToken: %s", idToken, refreshToken));
@@ -219,12 +225,4 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
             l.onIdTokenChanged(new InternalTokenResult(idToken));
         }
     }
-
-
-    private final Function<SignInResponse, SignInResponse> saveSignedInUser = response -> {
-        String idToken = response.getIdToken();
-        String refreshToken = response.getRefreshToken();
-        saveCurrentUser(idToken, refreshToken);
-        return response;
-    };
 }

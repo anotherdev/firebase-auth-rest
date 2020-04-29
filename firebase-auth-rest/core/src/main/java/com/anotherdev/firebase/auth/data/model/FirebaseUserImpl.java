@@ -13,7 +13,9 @@ import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.rest.RestAuthProvider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
+import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.google.firebase.FirebaseApp;
 import com.google.gson.JsonElement;
@@ -55,6 +57,11 @@ public class FirebaseUserImpl implements FirebaseUser {
             auth = FirebaseAuthRest.getInstance(app);
         }
         return auth;
+    }
+
+    @NonNull
+    private RestAuthProvider getAuthInternal() throws ClassCastException {
+        return (RestAuthProvider) getAuth();
     }
 
     @Override
@@ -104,7 +111,7 @@ public class FirebaseUserImpl implements FirebaseUser {
 
     @NonNull
     @Override
-    public Single<SignInResponse> linkWithCredential(AuthCredential credential) {
+    public Single<SignInResponse> linkWithCredential(@NonNull AuthCredential credential) {
         if (credential instanceof IdpAuthCredential) {
             IdpAuthCredential idp = (IdpAuthCredential) credential;
             return getAuth().linkWithCredential(this, idp);
@@ -117,11 +124,24 @@ public class FirebaseUserImpl implements FirebaseUser {
 
     @NonNull
     @Override
-    public Completable updateProfile(UserProfileChangeRequest request) {
+    public Completable updateProfile(@NonNull UserProfileChangeRequest request) {
         // TODO implement save returned updated data
         return Single.just(ImmutableUserProfileChangeRequest.copyOf(request))
                 .map(req -> req.withIdToken(idToken))
                 .flatMap(req -> RestAuthApi.auth().updateProfile(req))
+                .flatMapCompletable(ignored -> Completable.complete());
+    }
+
+    @NonNull
+    @Override
+    public Completable updatePassword(@NonNull String newPassword) {
+        return Single.just(newPassword)
+                .map(pass -> UserPasswordChangeRequest.builder()
+                        .idToken(idToken)
+                        .password(pass)
+                        .build())
+                .flatMap(req -> RestAuthApi.auth().updatePassword(req))
+                .doOnSuccess(response -> getAuthInternal().saveCurrentUser(response))
                 .flatMapCompletable(ignored -> Completable.complete());
     }
 

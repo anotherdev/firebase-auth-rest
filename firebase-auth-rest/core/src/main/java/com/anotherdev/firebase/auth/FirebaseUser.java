@@ -25,8 +25,11 @@ public interface FirebaseUser {
     String getEmail();
 
     @NonNull
-    Single<SignInResponse> linkWithCredential(AuthCredential credential);
+    Single<SignInResponse> linkWithCredential(@NonNull AuthCredential credential);
 
     @NonNull
-    Completable updateProfile(UserProfileChangeRequest request);
+    Completable updateProfile(@NonNull UserProfileChangeRequest request);
+
+    @NonNull
+    Completable updatePassword(@NonNull String newPassword);
 }

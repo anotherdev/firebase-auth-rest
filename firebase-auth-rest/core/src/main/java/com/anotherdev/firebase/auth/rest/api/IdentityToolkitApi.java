@@ -6,6 +6,7 @@ import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
+import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
 import com.google.gson.JsonObject;
 
 import io.reactivex.rxjava3.core.Single;
@@ -35,4 +36,7 @@ public interface IdentityToolkitApi {
 
     @POST("v1/accounts:update")
     Single<SignInResponse> updateProfile(@Body UserProfileChangeRequest request);
+
+    @POST("v1/accounts:update")
+    Single<SignInResponse> updatePassword(@Body UserPasswordChangeRequest request);
 }
