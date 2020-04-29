@@ -21,6 +21,8 @@ public class AuthError {
 
     private static final String TAG = AuthError.class.getName();
 
+    private static final int ERROR_CLIENT = 400;
+
 
     int code = 418;
     String message = "Unknown Error";
@@ -94,7 +96,7 @@ public class AuthError {
             }
             cause = cause.getCause();
         }
-        return UNKNOWN;
+        return t != null ? new AuthError(ERROR_CLIENT, t.toString()) : UNKNOWN;
     }
 
     private static boolean isClientSideNetworkError(@NonNull Throwable t) {
