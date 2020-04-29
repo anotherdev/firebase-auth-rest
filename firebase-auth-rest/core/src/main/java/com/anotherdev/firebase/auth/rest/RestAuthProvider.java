@@ -26,6 +26,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.internal.IdTokenListener;
+import com.google.firebase.auth.internal.InternalAuthProvider;
 import com.google.firebase.internal.InternalTokenResult;
 import com.google.firebase.internal.api.FirebaseNoSignedInUserException;
 
@@ -40,9 +41,9 @@ import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.internal.functions.Functions;
 import timber.log.Timber;
 
-public class RestAuthProvider implements FirebaseAuth {
+public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
 
-    private static final FirebaseUserImpl SIGNED_OUT = FirebaseUserImpl.from("SIGNED_OUT", null, null);
+    private static final FirebaseUserImpl SIGNED_OUT = FirebaseUserImpl.from(null, null, null);
 
     private final FirebaseApp app;
     private final Preference<FirebaseUserImpl> userStore;

@@ -25,7 +25,7 @@ import timber.log.Timber;
 @SuppressWarnings("WeakerAccess")
 public class FirebaseUserImpl implements FirebaseUser {
 
-    @NonNull
+    @Nullable
     String appName;
     @Nullable
     String idToken;
@@ -34,17 +34,26 @@ public class FirebaseUserImpl implements FirebaseUser {
     @NonNull
     JsonObject userInfo;
 
-    FirebaseApp app;
-    FirebaseAuth auth;
+    @Nullable
+    transient FirebaseAuth auth;
 
 
-    FirebaseUserImpl(@NonNull String appName, @Nullable String idToken, @Nullable String refreshToken) {
+    FirebaseUserImpl(@Nullable String appName, @Nullable String idToken, @Nullable String refreshToken) {
         this.appName = appName;
         this.idToken = idToken;
         this.refreshToken = refreshToken;
         userInfo = IdTokenParser.parseIdToken(idToken);
-        app = FirebaseApp.getInstance(appName);
-        auth = FirebaseAuthRest.getInstance(app);
+    }
+
+    @NonNull
+    private FirebaseAuth getAuth() {
+        if (auth == null) {
+            FirebaseApp app = appName != null
+                    ? FirebaseApp.getInstance(appName)
+                    : FirebaseApp.getInstance();
+            auth = FirebaseAuthRest.getInstance(app);
+        }
+        return auth;
     }
 
     @Override
@@ -97,7 +106,7 @@ public class FirebaseUserImpl implements FirebaseUser {
     public Single<SignInResponse> linkWithCredential(AuthCredential credential) {
         if (credential instanceof IdpAuthCredential) {
             IdpAuthCredential idp = (IdpAuthCredential) credential;
-            return auth.linkWithCredential(this, idp);
+            return getAuth().linkWithCredential(this, idp);
         } else {
             String credentialClassName = credential.getClass().getSimpleName();
             String error = String.format("AuthCredential: %s not supported yet.", credentialClassName);
@@ -128,7 +137,7 @@ public class FirebaseUserImpl implements FirebaseUser {
     }
 
 
-    public static FirebaseUserImpl from(@NonNull String appName,
+    public static FirebaseUserImpl from(@Nullable String appName,
                                         @Nullable String idToken,
                                         @Nullable String refreshToken) {
         return new FirebaseUserImpl(appName, idToken, refreshToken);
