@@ -3,6 +3,7 @@ package com.anotherdev.firebase.auth;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.rest.api.model.OptionalIdTokenRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.google.gson.annotations.SerializedName;
 
 import org.immutables.gson.Gson;
@@ -13,7 +14,7 @@ import java.util.List;
 @Value.Immutable
 @Value.Style(strictBuilder = true)
 @Gson.TypeAdapters
-public interface UserProfileChangeRequest extends OptionalIdTokenRequest {
+public interface UserProfileChangeRequest extends SignInRequest, OptionalIdTokenRequest {
 
     enum Attribute {
         DISPLAY_NAME,
