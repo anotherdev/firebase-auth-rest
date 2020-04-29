@@ -7,13 +7,13 @@ import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
+import com.anotherdev.firebase.auth.ImmutableUserProfileChangeRequest;
+import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.common.FirebaseAuth;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
-import com.anotherdev.firebase.auth.rest.api.model.ImmutableUserProfileChangeRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
-import com.anotherdev.firebase.auth.rest.api.model.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.google.firebase.FirebaseApp;
 import com.google.gson.JsonElement;

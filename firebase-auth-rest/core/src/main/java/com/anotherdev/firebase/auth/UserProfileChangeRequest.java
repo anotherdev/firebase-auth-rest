@@ -1,7 +1,8 @@
-package com.anotherdev.firebase.auth.rest.api.model;
+package com.anotherdev.firebase.auth;
 
 import androidx.annotation.Nullable;
 
+import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
 import com.google.gson.annotations.SerializedName;
 
 import org.immutables.gson.Gson;

@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
-import com.anotherdev.firebase.auth.rest.api.model.UserProfileChangeRequest;
 
 import io.reactivex.rxjava3.core.Single;
 

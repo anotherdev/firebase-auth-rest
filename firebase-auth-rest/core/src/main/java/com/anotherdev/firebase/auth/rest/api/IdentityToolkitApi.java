@@ -1,11 +1,11 @@
 package com.anotherdev.firebase.auth.rest.api;
 
+import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
-import com.anotherdev.firebase.auth.rest.api.model.UserProfileChangeRequest;
 import com.google.gson.JsonObject;
 
 import io.reactivex.rxjava3.core.Single;
