@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 
 public interface FirebaseUser {
@@ -27,5 +28,5 @@ public interface FirebaseUser {
     Single<SignInResponse> linkWithCredential(AuthCredential credential);
 
     @NonNull
-    Single<SignInResponse> updateProfile(UserProfileChangeRequest request);
+    Completable updateProfile(UserProfileChangeRequest request);
 }

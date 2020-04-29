@@ -19,6 +19,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import timber.log.Timber;
 
@@ -116,11 +117,12 @@ public class FirebaseUserImpl implements FirebaseUser {
 
     @NonNull
     @Override
-    public Single<SignInResponse> updateProfile(UserProfileChangeRequest request) {
+    public Completable updateProfile(UserProfileChangeRequest request) {
         // TODO implement save returned updated data
         return Single.just(ImmutableUserProfileChangeRequest.copyOf(request))
                 .map(req -> req.withIdToken(idToken))
-                .flatMap(req -> RestAuthApi.auth().updateProfile(req));
+                .flatMap(req -> RestAuthApi.auth().updateProfile(req))
+                .flatMapCompletable(ignored -> Completable.complete());
     }
 
     public long getExpirationTime() {
