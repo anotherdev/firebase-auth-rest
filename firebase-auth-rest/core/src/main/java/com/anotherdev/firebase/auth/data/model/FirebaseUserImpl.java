@@ -125,7 +125,6 @@ public class FirebaseUserImpl implements FirebaseUser {
     @NonNull
     @Override
     public Completable updateProfile(@NonNull UserProfileChangeRequest request) {
-        // TODO implement save returned updated data
         return Single.just(ImmutableUserProfileChangeRequest.copyOf(request))
                 .map(req -> req.withIdToken(idToken))
                 .flatMap(req -> RestAuthApi.auth().updateProfile(req))
