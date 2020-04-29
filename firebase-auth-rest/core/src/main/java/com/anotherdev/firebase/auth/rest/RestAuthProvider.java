@@ -13,7 +13,7 @@ import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithIdpRequest;
-import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
@@ -90,7 +90,7 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     @Override
     public Single<SignInResponse> signInAnonymously() {
         return RestAuthApi.auth()
-                .signInAnonymously(SignInRequest.builder().build())
+                .signInAnonymously(SignInAnonymouslyRequest.builder().build())
                 .map(saveSignedInUser);
     }
 
