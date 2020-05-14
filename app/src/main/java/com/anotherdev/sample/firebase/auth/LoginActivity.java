@@ -15,6 +15,8 @@ import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.SignInResponse;
+import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
+import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
@@ -112,6 +114,23 @@ public class LoginActivity extends BaseActivity {
         setupSignInWithFacebookButton(firebaseAuth);
         setupSignInWithGoogleButton(firebaseAuth);
         setupLogoutButton(firebaseAuth);
+    }
+
+    private void changePassword(String oldPassword, String newPassword) {
+        FirebaseAuth auth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (user != null && user.getEmail() != null) {
+            EmailAuthCredential email = EmailAuthProvider.getCredential(user.getEmail(), oldPassword);
+            onDestroy.add(user.reauthenticate(email)
+                    .flatMapCompletable(response -> {
+                        FirebaseUser reAuthUser = auth.getCurrentUser();
+                        return reAuthUser.updatePassword(newPassword);
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(this::dialog)
+                    .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
+        }
     }
 
     private void setupSignInAnonymouslyButton(FirebaseAuth firebaseAuth) {
