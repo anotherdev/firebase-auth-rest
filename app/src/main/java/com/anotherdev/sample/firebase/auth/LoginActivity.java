@@ -151,6 +151,11 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void startPasswordChange() {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            new ChangePasswordDialog(this)
+                    .show();
+        }
     }
 
     private void changePassword(String oldPassword, String newPassword) {
@@ -165,6 +170,7 @@ public class LoginActivity extends BaseActivity {
                         return reAuthUser.updatePassword(newPassword);
                     })
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doOnComplete(() -> dialog("", "Password changed"))
                     .doOnError(this::dialog)
                     .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
         }
