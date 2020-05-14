@@ -145,7 +145,7 @@ public class FirebaseUserImpl implements FirebaseUser {
         return Single.just(ImmutableUserProfileChangeRequest.copyOf(request))
                 .map(req -> req.withIdToken(idToken))
                 .flatMap(req -> RestAuthApi.auth().updateProfile(req))
-                .doOnSuccess(response -> getAuthInternal().saveCurrentUser(response))
+                .doOnSuccess(response -> getAuthInternal().getAccessToken(true))
                 .flatMapCompletable(ignored -> Completable.complete());
     }
 
