@@ -136,11 +136,15 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void dialog(Throwable e) {
         AuthError ae = AuthError.fromThrowable(e);
+        dialog("Error", String.format("code: %s\nmessage: %s\ncause: %s", ae.getCode(), ae.getMessage(), ae.getCause()));
+    }
+
+    protected void dialog(String title, String text) {
         new LovelyInfoDialog(this)
                 .setTopColorRes(R.color.colorPrimary)
-                .setTopTitle("Error")
+                .setTopTitle(title)
                 .setTopTitleColor(getResources().getColor(android.R.color.white))
-                .setMessage(String.format("code: %s\nmessage: %s\ncause: %s", ae.getCode(), ae.getMessage(), ae.getCause()))
+                .setMessage(text)
                 .show();
     }
 
