@@ -2,6 +2,7 @@ package com.anotherdev.sample.firebase.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
+import androidx.core.util.ObjectsCompat;
 
 import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
@@ -123,7 +125,7 @@ public class LoginActivity extends BaseActivity {
     private void startProfileEditing() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
-            String oldDisplayName = user.getDisplayName();
+            final String oldDisplayName = user.getDisplayName();
             new LovelyTextInputDialog(this)
                     .setTopColorRes(R.color.colorPrimary)
                     .setTopTitle(R.string.edit_profile)
@@ -132,11 +134,15 @@ public class LoginActivity extends BaseActivity {
                     .setMessage("Display Name")
                     .setInitialInput(oldDisplayName)
                     .setConfirmButton(android.R.string.ok, newDisplayName -> {
-                        UserProfileChangeRequest request = UserProfileChangeRequest.builder()
-                                .displayName(newDisplayName)
-                                .build();
-                        onDestroy.add(user.updateProfile(request)
-                                .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
+                        if (!ObjectsCompat.equals(oldDisplayName, newDisplayName)) {
+                            UserProfileChangeRequest request = UserProfileChangeRequest.builder()
+                                    .displayName(newDisplayName)
+                                    .build();
+                            onDestroy.add(user.updateProfile(request)
+                                    .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
+                        } else {
+                            Log.w(TAG, "Same display name. Ignored.");
+                        }
                     })
                     .show();
         } else {
