@@ -12,4 +12,7 @@
     <string name="sign_in__with_google">Sign In With Google</string>
     <string name="log_out">Log Out</string>
 
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_password">Change Password</string>
+
 </resources>

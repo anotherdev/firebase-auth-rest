@@ -2,6 +2,8 @@ package com.anotherdev.sample.firebase.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,6 +17,7 @@ import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.SignInResponse;
+import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
@@ -32,6 +35,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.FirebaseApp;
+import com.yarolegovich.lovelydialog.LovelyTextInputDialog;
 
 import butterknife.BindView;
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
@@ -114,6 +118,33 @@ public class LoginActivity extends BaseActivity {
         setupSignInWithFacebookButton(firebaseAuth);
         setupSignInWithGoogleButton(firebaseAuth);
         setupLogoutButton(firebaseAuth);
+    }
+
+    private void startProfileEditing() {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            String oldDisplayName = user.getDisplayName();
+            new LovelyTextInputDialog(this)
+                    .setTopColorRes(R.color.colorPrimary)
+                    .setTopTitle(R.string.edit_profile)
+                    .setTopTitleColor(getResources().getColor(android.R.color.white))
+                    .setIcon(R.drawable.ic_edit_white_24dp)
+                    .setMessage("Display Name")
+                    .setInitialInput(oldDisplayName)
+                    .setConfirmButton(android.R.string.ok, newDisplayName -> {
+                        UserProfileChangeRequest request = UserProfileChangeRequest.builder()
+                                .displayName(newDisplayName)
+                                .build();
+                        onDestroy.add(user.updateProfile(request)
+                                .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
+                    })
+                    .show();
+        } else {
+            dialog(new IllegalStateException("User null"));
+        }
+    }
+
+    private void startPasswordChange() {
     }
 
     private void changePassword(String oldPassword, String newPassword) {
@@ -269,6 +300,25 @@ public class LoginActivity extends BaseActivity {
         onDestroy.add(firebaseAuth.authStateChanges()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(authStateConsumer, RxUtil.ON_ERROR_LOG_V3));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_login, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        final int itemId = item.getItemId();
+        if (R.id.action_edit_profile == itemId) {
+            startProfileEditing();
+            return true;
+        } else if (R.id.action_change_password == itemId) {
+            startPasswordChange();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
