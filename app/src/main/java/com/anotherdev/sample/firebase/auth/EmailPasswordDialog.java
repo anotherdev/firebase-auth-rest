@@ -6,6 +6,7 @@ import android.widget.EditText;
 
 import com.anotherdev.firebase.auth.SignInResponse;
 
+import butterknife.BindView;
 import io.reactivex.rxjava3.core.Single;
 
 @SuppressWarnings("WeakerAccess")
@@ -15,8 +16,8 @@ public class EmailPasswordDialog extends MultipleTextInputDialog {
         Single<SignInResponse> onConfirmClick(String email, String password);
     }
 
-    private EditText emailEditText;
-    private EditText passwordEditText;
+    @BindView(R.id.email_edittext) EditText emailEditText;
+    @BindView(R.id.password_edittext) EditText passwordEditText;
 
     private OnConfirmClickListener confirmClickListener;
 
@@ -29,13 +30,6 @@ public class EmailPasswordDialog extends MultipleTextInputDialog {
     @Override
     protected int getLayoutRes() {
         return R.layout.view_email_password_input;
-    }
-
-    @Override
-    protected void onConfigureView(View view) {
-        super.onConfigureView(view);
-        emailEditText = view.findViewById(R.id.email_edittext);
-        passwordEditText = view.findViewById(R.id.password_edittext);
     }
 
     @Override

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 
+import butterknife.BindView;
+
 @SuppressWarnings("WeakerAccess")
 public class ChangePasswordDialog extends MultipleTextInputDialog {
 
@@ -11,9 +13,9 @@ public class ChangePasswordDialog extends MultipleTextInputDialog {
         void onConfirmClick(String oldPassword, String newPassword);
     }
 
-    private EditText currentPasswordEditText;
-    private EditText newPasswordEditText;
-    private EditText verifyPasswordEditText;
+    @BindView(R.id.old_password_edittext) EditText currentPasswordEditText;
+    @BindView(R.id.new_password_edittext) EditText newPasswordEditText;
+    @BindView(R.id.verify_password_edittext) EditText verifyPasswordEditText;
 
     private OnConfirmClickListener confirmClickListener;
 
@@ -28,14 +30,6 @@ public class ChangePasswordDialog extends MultipleTextInputDialog {
     @Override
     protected int getLayoutRes() {
         return R.layout.view_change_password_input;
-    }
-
-    @Override
-    protected void onConfigureView(View view) {
-        super.onConfigureView(view);
-        currentPasswordEditText = view.findViewById(R.id.old_password_edittext);
-        newPasswordEditText = view.findViewById(R.id.new_password_edittext);
-        verifyPasswordEditText = view.findViewById(R.id.verify_password_edittext);
     }
 
     @Override

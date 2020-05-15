@@ -10,9 +10,12 @@ import androidx.annotation.StringRes;
 
 import com.yarolegovich.lovelydialog.LovelyCustomDialog;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 abstract class MultipleTextInputDialog extends LovelyCustomDialog {
 
-    private TextView positiveButton;
+    @BindView(R.id.positive_button) TextView positiveButton;
 
 
     MultipleTextInputDialog(Context context) {
@@ -28,7 +31,7 @@ abstract class MultipleTextInputDialog extends LovelyCustomDialog {
 
     @CallSuper
     protected void onConfigureView(View view) {
-        positiveButton = view.findViewById(R.id.positive_button);
+        ButterKnife.bind(this, view);
     }
 
     @CallSuper
