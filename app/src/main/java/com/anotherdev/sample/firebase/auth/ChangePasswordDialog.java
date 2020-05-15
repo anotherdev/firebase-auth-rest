@@ -4,15 +4,25 @@ import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 
+@SuppressWarnings("WeakerAccess")
 public class ChangePasswordDialog extends MultipleTextInputDialog {
+
+    public interface OnConfirmClickListener {
+        void onConfirmClick(String oldPassword, String newPassword);
+    }
 
     private EditText currentPasswordEditText;
     private EditText newPasswordEditText;
     private EditText verifyPasswordEditText;
 
+    private OnConfirmClickListener confirmClickListener;
+
 
     public ChangePasswordDialog(Context context) {
         super(context);
+        setTopTitle(R.string.change_password);
+        setTopTitleColor(context.getResources().getColor(android.R.color.white));
+        setIcon(R.drawable.ic_vpn_key_white_24dp);
     }
 
     @Override
@@ -40,8 +50,17 @@ public class ChangePasswordDialog extends MultipleTextInputDialog {
         return this;
     }
 
+    public ChangePasswordDialog onConfirm(OnConfirmClickListener listener) {
+        confirmClickListener = listener;
+        return this;
+    }
+
     @Override
     protected void dispatchOnConfirmClick() {
-        // TODO implement this
+        String oldPassword = currentPasswordEditText.getText().toString();
+        String newPassword = newPasswordEditText.getText().toString();
+        if (confirmClickListener != null) {
+            confirmClickListener.onConfirmClick(oldPassword, newPassword);
+        }
     }
 }

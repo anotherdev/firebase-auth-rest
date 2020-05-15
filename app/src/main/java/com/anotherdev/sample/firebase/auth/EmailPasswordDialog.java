@@ -50,6 +50,11 @@ public class EmailPasswordDialog extends MultipleTextInputDialog {
         return this;
     }
 
+    public EmailPasswordDialog onConfirm(OnConfirmClickListener listener) {
+        confirmClickListener = listener;
+        return this;
+    }
+
     @Override
     protected void dispatchOnConfirmClick() {
         String email = emailEditText.getText().toString();
@@ -57,10 +62,5 @@ public class EmailPasswordDialog extends MultipleTextInputDialog {
         if (confirmClickListener != null) {
             confirmClickListener.onConfirmClick(email, password);
         }
-    }
-
-    public EmailPasswordDialog onConfirm(OnConfirmClickListener listener) {
-        confirmClickListener = listener;
-        return this;
     }
 }

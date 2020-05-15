@@ -154,6 +154,7 @@ public class LoginActivity extends BaseActivity {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
             new ChangePasswordDialog(this)
+                    .onConfirm(this::changePassword)
                     .show();
         }
     }
@@ -163,16 +164,16 @@ public class LoginActivity extends BaseActivity {
         FirebaseUser user = auth.getCurrentUser();
 
         if (user != null && user.getEmail() != null) {
-            EmailAuthCredential email = EmailAuthProvider.getCredential(user.getEmail(), oldPassword);
-            onDestroy.add(user.reauthenticate(email)
-                    .flatMapCompletable(response -> {
-                        FirebaseUser reAuthUser = auth.getCurrentUser();
-                        return reAuthUser.updatePassword(newPassword);
-                    })
+            EmailAuthCredential oldCredential = EmailAuthProvider.getCredential(user.getEmail(), oldPassword);
+            //noinspection ResultOfMethodCallIgnored
+            user.reauthenticate(oldCredential)
+                    .flatMapCompletable(response -> auth.getCurrentUser()
+                            .updatePassword(newPassword))
+                    .doOnSubscribe(onDestroy::add)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnComplete(() -> dialog("", "Password changed"))
+                    .doOnComplete(() -> dialog(getString(R.string.change_password), "Password changed"))
                     .doOnError(this::dialog)
-                    .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
+                    .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3);
         }
     }
 
