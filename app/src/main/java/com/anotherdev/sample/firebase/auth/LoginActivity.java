@@ -58,6 +58,7 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.auth_facebook_button) LoginButton facebookLoginButton;
     @BindView(R.id.auth_sign_in_with_facebook_button) Button signInWithFacebookButton;
     @BindView(R.id.auth_sign_in_with_google_button) Button signInWithGoogleButton;
+    @BindView(R.id.auth_sign_in_with_line_button) Button signInWithLineButton;
     @BindView(R.id.auth_logout_button) Button logoutButton;
 
     private final CallbackManager facebookCallbackManager = CallbackManager.Factory.create();
@@ -119,6 +120,7 @@ public class LoginActivity extends BaseActivity {
         setupSignInWithEmailButton(firebaseAuth);
         setupSignInWithFacebookButton(firebaseAuth);
         setupSignInWithGoogleButton(firebaseAuth);
+        setupSignInWithLineButton(firebaseAuth);
         setupLogoutButton(firebaseAuth);
     }
 
@@ -291,6 +293,27 @@ public class LoginActivity extends BaseActivity {
                     signInWithGoogleButton.setEnabled(isLoggedOut);
                     if (isLoggedOut) {
                         googleSignInClient.signOut();
+                    }
+                });
+    }
+
+    private void setupSignInWithLineButton(FirebaseAuth firebaseAuth) {
+        setupButton(firebaseAuth,
+                signInWithLineButton,
+                v -> {
+                    String customToken = "Hello.World.!";
+                    //noinspection ResultOfMethodCallIgnored
+                    firebaseAuth.signInWithCustomToken(customToken)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .doOnSubscribe(onDestroy::add)
+                            .doOnError(this::dialog)
+                            .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
+                },
+                auth -> {
+                    boolean isLoggedOut = !auth.isSignedIn();
+                    //signInWithLineButton.setEnabled(isLoggedOut);
+                    if (isLoggedOut) {
+                        // Logout from line sdk?
                     }
                 });
     }
