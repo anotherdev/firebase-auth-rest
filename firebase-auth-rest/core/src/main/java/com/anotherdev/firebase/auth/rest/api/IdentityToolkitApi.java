@@ -4,6 +4,7 @@ import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SignInWithCustomTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
 import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
@@ -32,7 +33,7 @@ public interface IdentityToolkitApi {
     Single<SignInResponse> signInWithCredential(@Body SignInWithIdpRequest request);
 
     @POST("v1/accounts:signInWithCustomToken")
-    Single<SignInResponse> signInWithCustomToken(@Body SignInRequest request);
+    Single<SignInResponse> signInWithCustomToken(@Body SignInWithCustomTokenRequest request);
 
     @POST("v1/accounts:lookup")
     Single<JsonObject> getAccounts(@Body IdTokenRequest request);
