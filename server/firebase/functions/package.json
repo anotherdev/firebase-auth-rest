@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "firebase-admin": "^8.12.1",
-    "firebase-functions": "^3.6.1"
+    "firebase-functions": "^3.6.1",
+    "save": "^2.4.0"
   },
   "devDependencies": {
     "eslint": "^7.0.0",
