@@ -31,6 +31,9 @@ public interface IdentityToolkitApi {
     @POST("v1/accounts:signInWithIdp")
     Single<SignInResponse> signInWithCredential(@Body SignInWithIdpRequest request);
 
+    @POST("v1/accounts:signInWithCustomToken")
+    Single<SignInResponse> signInWithCustomToken(@Body SignInRequest request);
+
     @POST("v1/accounts:lookup")
     Single<JsonObject> getAccounts(@Body IdTokenRequest request);
 
