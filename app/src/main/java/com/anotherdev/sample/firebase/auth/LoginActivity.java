@@ -36,7 +36,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.FirebaseApp;
+import com.linecorp.linesdk.LoginDelegate;
+import com.linecorp.linesdk.Scope;
+import com.linecorp.linesdk.auth.LineAuthenticationParams;
 import com.yarolegovich.lovelydialog.LovelyTextInputDialog;
+
+import java.util.Collections;
 
 import butterknife.BindView;
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
@@ -63,6 +68,7 @@ public class LoginActivity extends BaseActivity {
 
     private final CallbackManager facebookCallbackManager = CallbackManager.Factory.create();
     private GoogleSignInClient googleSignInClient;
+    private final LoginDelegate lineLoginDelegate = LoginDelegate.Factory.create();
 
     private FirebaseAuth firebaseAuth;
 
@@ -298,6 +304,12 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void setupSignInWithLineButton(FirebaseAuth firebaseAuth) {
+        lineLoginButton.setChannelId(getString(R.string.line_channel_id));
+        lineLoginButton.enableLineAppAuthentication(true);
+        lineLoginButton.setAuthenticationParams(new LineAuthenticationParams.Builder()
+                .scopes(Collections.singletonList(Scope.PROFILE))
+                .build());
+        lineLoginButton.setLoginDelegate(lineLoginDelegate);
         setupButton(firebaseAuth,
                 signInWithLineButton,
                 v -> {
