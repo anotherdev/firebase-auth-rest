@@ -4,4 +4,7 @@
     <string name="facebook_app_id">489919228562519</string>
     <string name="fb_login_protocol_scheme">fb489919228562519</string>
 
+    <!-- Production Line Channel Id -->
+    <string name="line_channel_id">1654238821</string>
+
 </resources>
