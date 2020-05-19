@@ -31,7 +31,6 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -55,9 +54,10 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.auth_sign_in_anonymously_button) Button signInAnonymouslyButton;
     @BindView(R.id.auth_register_email_button) Button registerEmailButton;
     @BindView(R.id.auth_sign_in_email_button) Button signInWithEmailButton;
-    @BindView(R.id.auth_facebook_button) LoginButton facebookLoginButton;
+    @BindView(R.id.auth_facebook_button) com.facebook.login.widget.LoginButton facebookLoginButton;
     @BindView(R.id.auth_sign_in_with_facebook_button) Button signInWithFacebookButton;
     @BindView(R.id.auth_sign_in_with_google_button) Button signInWithGoogleButton;
+    @BindView(R.id.auth_line_button) com.linecorp.linesdk.widget.LoginButton lineLoginButton;
     @BindView(R.id.auth_sign_in_with_line_button) Button signInWithLineButton;
     @BindView(R.id.auth_logout_button) Button logoutButton;
 

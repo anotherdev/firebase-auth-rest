@@ -99,12 +99,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="@android:dimen/app_icon_size" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/auth_sign_in_with_line_button"
-                android:text="@string/sign_in__with_line"
+            <RelativeLayout
                 android:layout_margin="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="@android:dimen/app_icon_size" />
+                android:layout_height="@android:dimen/app_icon_size">
+
+                <com.linecorp.linesdk.widget.LoginButton
+                    android:id="@+id/auth_line_button"
+                    android:layout_centerInParent="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:visibility="invisible"
+                    android:id="@+id/auth_sign_in_with_line_button"
+                    android:text="@string/sign_in__with_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="@android:dimen/app_icon_size" />
+
+            </RelativeLayout>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/auth_logout_button"
