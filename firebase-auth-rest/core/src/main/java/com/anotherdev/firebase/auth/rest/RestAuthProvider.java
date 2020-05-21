@@ -15,6 +15,7 @@ import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithIdpRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SignInWithCustomTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
@@ -122,6 +123,17 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     public Single<SignInResponse> signInWithCredential(@NonNull IdpAuthCredential credential) {
         ImmutableSignInWithIdpRequest.Builder builder = SignInWithIdpRequest.builder();
         return performSignInWithCredential(builder, credential);
+    }
+
+    @NonNull
+    @Override
+    public Single<SignInResponse> signInWithCustomToken(@NonNull String customToken) {
+        SignInWithCustomTokenRequest request = SignInWithCustomTokenRequest.builder()
+                .customToken(customToken)
+                .build();
+        return RestAuthApi.auth()
+                .signInWithCustomToken(request)
+                .map(this::saveCurrentUser);
     }
 
     @NonNull

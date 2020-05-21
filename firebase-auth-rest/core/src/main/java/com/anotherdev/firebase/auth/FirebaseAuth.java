@@ -47,6 +47,10 @@ public interface FirebaseAuth {
 
     @NonNull
     @CheckReturnValue
+    Single<SignInResponse> signInWithCustomToken(@NonNull String customToken);
+
+    @NonNull
+    @CheckReturnValue
     Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull IdpAuthCredential credential);
 
     void signOut();
