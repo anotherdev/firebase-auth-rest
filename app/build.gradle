@@ -63,6 +63,8 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:25.2.2")
     implementation "com.google.firebase:firebase-analytics"
     implementation "com.google.firebase:firebase-database"
+    // TODO remove this after done with phone auth
+    implementation "com.google.firebase:firebase-auth"
 
     //noinspection AnnotationProcessorOnCompilePath
     implementation "com.jakewharton:butterknife:10.2.1"

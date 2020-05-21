@@ -23,6 +23,8 @@
             android:label="@string/accounts"
             android:parentActivityName="com.anotherdev.sample.firebase.auth.MainActivity" />
 
+        <activity android:name="com.anotherdev.sample.firebase.auth.PhoneLoginActivity" />
+
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
