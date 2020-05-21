@@ -2,6 +2,8 @@ package com.anotherdev.firebase.auth.provider;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.annotations.SerializedName;
+
 import org.immutables.gson.Gson;
 import org.immutables.value.Value;
 
@@ -9,6 +11,12 @@ import org.immutables.value.Value;
 @Value.Style(strictBuilder = true)
 @Gson.TypeAdapters
 public abstract class PhoneAuthCredential implements AuthCredential {
+
+    @SerializedName("verificationId")
+    public abstract String getVerificationId();
+
+    @SerializedName("smsCode")
+    public abstract String getSmsCode();
 
     @NonNull
     @Override
