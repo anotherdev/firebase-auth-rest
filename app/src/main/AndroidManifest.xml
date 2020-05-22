@@ -25,6 +25,8 @@
 
         <activity android:name="com.anotherdev.sample.firebase.auth.PhoneLoginActivity" />
 
+        <activity android:name="com.anotherdev.sample.firebase.auth.JsPhoneLoginActivity" />
+
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
