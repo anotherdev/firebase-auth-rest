@@ -55,7 +55,7 @@ public class JsPhoneLoginActivity extends BaseActivity {
             final String message = msg.message();
             final String sourceId = msg.sourceId();
             String error = String.format("class: %s level: %s line: %s msg: %s sourceId: %s", className, level, line, message, sourceId);
-            Log.e(TAG, error);
+            Log.i(TAG, error);
             return false;
         }
     };
