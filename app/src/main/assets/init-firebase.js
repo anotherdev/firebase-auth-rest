@@ -1,6 +1,6 @@
 var firebaseConfig = {
     apiKey: "AIzaSyDz2SCXhveewkkuEC0fu4AiPFfHifeDHNE",
-    authDomain: "project-id.firebaseapp.com",
+    authDomain: "huawei-dtse.firebaseapp.com",
     databaseURL: "https://huawei-dtse.firebaseio.com",
     projectId: "huawei-dtse",
     storageBucket: "huawei-dtse.appspot.com",
