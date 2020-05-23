@@ -14,14 +14,14 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.webkit.WebViewCompat;
 
-public class FirebaseJsSdkWebView {
+public class FirebaseJsSdk {
 
-    private static final String TAG = FirebaseJsSdkWebView.class.getName();
+    private static final String TAG = FirebaseJsSdk.class.getName();
 
     private final WebView webView;
 
 
-    public FirebaseJsSdkWebView(@NonNull Context context) {
+    public FirebaseJsSdk(@NonNull Context context) {
         webView = new WebView(context);
         init(context);
     }
