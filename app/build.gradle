@@ -47,6 +47,7 @@ dependencies {
     debugImplementation project(':firebase-auth-rest:core')
 
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.webkit:webkit:1.2.0"
 
     implementation 'com.facebook.android:facebook-login:6.3.0'
 
