@@ -15,8 +15,8 @@ firebase.initializeApp(firebaseConfig);
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     // User is signed in.
-    console.log("SIGNED IN: " + user);
     var json = JSON.stringify(user);
+    console.log("SIGNED IN: " + json);
     FirebaseAuthJs.onAuthStateChanged(json);
   } else {
     console.log("SIGNED OUT");
