@@ -3,6 +3,7 @@ package com.anotherdev.sample.firebase.auth;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +30,10 @@ public class PhoneLoginActivity extends BaseActivity {
 
     String verificationId;
 
+    FirebaseAuthJsSdk firebaseAuthJsSdk;
+
+    @BindView(R.id.webview_container) ViewGroup webViewContainer;
+
 
     @Override
     protected int getActivityLayoutRes() {
@@ -39,6 +44,10 @@ public class PhoneLoginActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle("Phone Login");
+
+        firebaseAuthJsSdk = new FirebaseAuthJsSdk(this);
+
+        webViewContainer.addView(firebaseAuthJsSdk.getWebView());
 
         phoneNumberTextFieldBoxes.getEndIconImageButton()
                 .setOnClickListener(v -> {

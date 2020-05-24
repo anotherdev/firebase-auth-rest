@@ -18,7 +18,7 @@
         android:padding="8dp"
         android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <studio.carbonylgroup.textfieldboxes.TextFieldBoxes
             android:id="@+id/phone_number_tfb"
@@ -57,6 +57,11 @@
                 tools:ignore="HardcodedText" />
 
         </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
+
+        <FrameLayout
+            android:id="@+id/webview_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 
