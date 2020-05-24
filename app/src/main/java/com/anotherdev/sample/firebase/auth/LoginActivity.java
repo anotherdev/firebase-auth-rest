@@ -26,6 +26,7 @@ import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.util.RxUtil;
+import com.anotherdev.sample.firebase.auth.intent.PhoneLoginIntent;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -58,6 +59,7 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.auth_facebook_button) LoginButton facebookLoginButton;
     @BindView(R.id.auth_sign_in_with_facebook_button) Button signInWithFacebookButton;
     @BindView(R.id.auth_sign_in_with_google_button) Button signInWithGoogleButton;
+    @BindView(R.id.auth_sign_in_with_phone_button) Button signInWithPhoneButton;
     @BindView(R.id.auth_logout_button) Button logoutButton;
 
     private final CallbackManager facebookCallbackManager = CallbackManager.Factory.create();
@@ -119,6 +121,7 @@ public class LoginActivity extends BaseActivity {
         setupSignInWithEmailButton(firebaseAuth);
         setupSignInWithFacebookButton(firebaseAuth);
         setupSignInWithGoogleButton(firebaseAuth);
+        setupSignInWithPhoneButton(firebaseAuth);
         setupLogoutButton(firebaseAuth);
     }
 
@@ -293,6 +296,16 @@ public class LoginActivity extends BaseActivity {
                         googleSignInClient.signOut();
                     }
                 });
+    }
+
+    private void setupSignInWithPhoneButton(FirebaseAuth firebaseAuth) {
+        setupButton(firebaseAuth,
+                signInWithPhoneButton,
+                v -> {
+                    signInWithPhoneButton.setEnabled(true);
+                    startActivity(new PhoneLoginIntent(this));
+                },
+                auth -> signInWithPhoneButton.setEnabled(!auth.isSignedIn() || true));
     }
 
     private void setupLogoutButton(FirebaseAuth firebaseAuth) {
