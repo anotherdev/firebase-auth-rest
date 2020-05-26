@@ -1,32 +1,35 @@
 package com.anotherdev.firebase.auth;
 
-@SuppressWarnings("WeakerAccess")
-public class SignInResponse {
+import androidx.annotation.Nullable;
 
-    String idToken;
-    String email;
-    String refreshToken;
-    String expiresIn;
-    String localId;
+import com.google.gson.annotations.SerializedName;
+
+import org.immutables.gson.Gson;
+import org.immutables.value.Value;
+
+@Value.Immutable
+@Value.Style(strictBuilder = true)
+@Gson.TypeAdapters
+public interface SignInResponse {
+
+    @SerializedName("idToken")
+    String getIdToken();
+
+    @Nullable
+    @SerializedName("email")
+    String getEmail();
+
+    @SerializedName("refreshToken")
+    String getRefreshToken();
+
+    @SerializedName("expiresIn")
+    String getExpiresIn();
+
+    @SerializedName("localId")
+    String getLocalId();
 
 
-    public String getIdToken() {
-        return idToken;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public String getExpiresIn() {
-        return expiresIn;
-    }
-
-    public String getLocalId() {
-        return localId;
+    static ImmutableSignInResponse.Builder builder() {
+        return ImmutableSignInResponse.builder();
     }
 }

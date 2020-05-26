@@ -2,6 +2,7 @@ package com.anotherdev.firebase.auth.rest.api;
 
 import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.UserProfileChangeRequest;
+import com.anotherdev.firebase.auth.UserProfileChangeResponse;
 import com.anotherdev.firebase.auth.rest.api.model.IdTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithCustomTokenRequest;
@@ -39,7 +40,7 @@ public interface IdentityToolkitApi {
     Single<JsonObject> getAccounts(@Body IdTokenRequest request);
 
     @POST("v1/accounts:update")
-    Single<SignInResponse> updateProfile(@Body UserProfileChangeRequest request);
+    Single<UserProfileChangeResponse> updateProfile(@Body UserProfileChangeRequest request);
 
     @POST("v1/accounts:update")
     Single<SignInResponse> updatePassword(@Body UserPasswordChangeRequest request);
