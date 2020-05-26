@@ -11,7 +11,6 @@ import com.google.firebase.FirebaseApp;
 import io.reactivex.rxjava3.annotations.CheckReturnValue;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
-import retrofit2.http.Body;
 
 public interface FirebaseAuth {
 
@@ -58,7 +57,7 @@ public interface FirebaseAuth {
 
     @NonNull
     @CheckReturnValue
-    Single<SendPasswordResetEmailResponse> sendPasswordResetEmail(@Body SendPasswordResetEmailRequest request);
+    Single<SendPasswordResetEmailResponse> sendPasswordResetEmail(SendPasswordResetEmailRequest request);
 
     void signOut();
 }
