@@ -25,6 +25,7 @@ public interface SignInResponse {
     @SerializedName("expiresIn")
     String getExpiresIn();
 
+    @Nullable
     @SerializedName("localId")
     String getLocalId();
 
