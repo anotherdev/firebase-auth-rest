@@ -14,6 +14,8 @@ import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithIdpRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithCustomTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
@@ -153,6 +155,12 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
         return RestAuthApi.auth()
                 .signInWithCredential(request)
                 .map(this::saveCurrentUser);
+    }
+
+    @NonNull
+    @Override
+    public Single<SendPasswordResetEmailResponse> sendPasswordResetEmail(SendPasswordResetEmailRequest request) {
+        return RestAuthApi.auth().sendPasswordResetEmail(request);
     }
 
     @Override
