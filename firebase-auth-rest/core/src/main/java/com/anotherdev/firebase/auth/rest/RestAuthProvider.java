@@ -10,9 +10,12 @@ import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.data.model.FirebaseUserImpl;
+import com.anotherdev.firebase.auth.data.model.UserProfile;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
+import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoRequest;
+import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoResponse;
 import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithIdpRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
@@ -93,7 +96,8 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     public Single<SignInResponse> signInAnonymously() {
         return RestAuthApi.auth()
                 .signInAnonymously(SignInAnonymouslyRequest.builder().build())
-                .map(this::saveCurrentUser);
+                .map(this::saveCurrentUser)
+                .map(this::getAccountInfo);
     }
 
     @NonNull
@@ -105,7 +109,8 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 .build();
         return RestAuthApi.auth()
                 .createUserWithEmailAndPassword(request)
-                .map(this::saveCurrentUser);
+                .map(this::saveCurrentUser)
+                .map(this::getAccountInfo);
     }
 
     @NonNull
@@ -117,7 +122,8 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 .build();
         return RestAuthApi.auth()
                 .signInWithEmailAndPassword(request)
-                .map(this::saveCurrentUser);
+                .map(this::saveCurrentUser)
+                .map(this::getAccountInfo);
     }
 
     @NonNull
@@ -135,7 +141,8 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 .build();
         return RestAuthApi.auth()
                 .signInWithCustomToken(request)
-                .map(this::saveCurrentUser);
+                .map(this::saveCurrentUser)
+                .map(this::getAccountInfo);
     }
 
     @NonNull
@@ -154,7 +161,8 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 .build();
         return RestAuthApi.auth()
                 .signInWithCredential(request)
-                .map(this::saveCurrentUser);
+                .map(this::saveCurrentUser)
+                .map(this::getAccountInfo);
     }
 
     @NonNull
@@ -244,5 +252,20 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
         for (IdTokenListener l : listeners) {
             l.onIdTokenChanged(new InternalTokenResult(idToken));
         }
+    }
+
+    private SignInResponse getAccountInfo(SignInResponse signInResponse) {
+        GetAccountInfoRequest request = GetAccountInfoRequest.builder()
+                .idToken(signInResponse.getIdToken())
+                .build();
+        GetAccountInfoResponse accountInfo = RestAuthApi.auth()
+                .getAccounts(request).blockingGet();
+
+        Data dataStore = Data.from(app.getApplicationContext());
+        for (UserProfile profile : accountInfo.getUsers()) {
+            final String uid = profile.getLocalId();
+            dataStore.getUserProfile(uid).set(profile);
+        }
+        return signInResponse;
     }
 }

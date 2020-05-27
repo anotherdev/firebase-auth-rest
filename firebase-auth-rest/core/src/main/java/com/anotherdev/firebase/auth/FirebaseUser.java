@@ -6,6 +6,8 @@ import androidx.annotation.Nullable;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.google.gson.JsonObject;
 
+import java.util.List;
+
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 
@@ -27,6 +29,9 @@ public interface FirebaseUser {
 
     @Nullable
     String getEmail();
+
+    @NonNull
+    List<UserInfo> getProviderData();
 
     boolean isAnonymous();
 

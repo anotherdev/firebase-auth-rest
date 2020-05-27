@@ -10,7 +10,9 @@ import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
 import com.anotherdev.firebase.auth.ImmutableUserProfileChangeRequest;
 import com.anotherdev.firebase.auth.SignInResponse;
+import com.anotherdev.firebase.auth.UserInfo;
 import com.anotherdev.firebase.auth.UserProfileChangeRequest;
+import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
@@ -22,6 +24,8 @@ import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.google.firebase.FirebaseApp;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import java.util.List;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
@@ -45,6 +49,7 @@ public class FirebaseUserImpl implements FirebaseUser {
 
     @Nullable
     transient FirebaseAuth auth;
+    transient Data data;
 
 
     FirebaseUserImpl() {
@@ -78,6 +83,13 @@ public class FirebaseUserImpl implements FirebaseUser {
             auth = FirebaseAuthRest.getInstance(app);
         }
         return auth;
+    }
+
+    public Data getData() {
+        if (data == null) {
+            data = Data.from(getAuth().getApp().getApplicationContext());
+        }
+        return data;
     }
 
     @NonNull
@@ -133,6 +145,15 @@ public class FirebaseUserImpl implements FirebaseUser {
     @Override
     public String getEmail() {
         return getAsString(userInfo, "email");
+    }
+
+    @NonNull
+    @Override
+    public List<UserInfo> getProviderData() {
+        String uid = getUid();
+        return getData().getUserProfile(uid != null ? uid : "")
+                .get()
+                .providerUserInfo();
     }
 
     @Override
