@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 
+import io.reactivex.rxjava3.annotations.CheckReturnValue;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 
@@ -36,17 +37,22 @@ public interface FirebaseUser {
     boolean isAnonymous();
 
     @NonNull
+    @CheckReturnValue
     Single<SignInResponse> linkWithCredential(@NonNull AuthCredential credential);
 
     @NonNull
+    @CheckReturnValue
     Single<SignInResponse> reauthenticate(@NonNull AuthCredential credential);
 
     @NonNull
+    @CheckReturnValue
     Completable reload();
 
     @NonNull
+    @CheckReturnValue
     Completable updateProfile(@NonNull UserProfileChangeRequest request);
 
     @NonNull
+    @CheckReturnValue
     Completable updatePassword(@NonNull String newPassword);
 }
