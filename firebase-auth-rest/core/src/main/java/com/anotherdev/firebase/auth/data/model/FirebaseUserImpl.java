@@ -87,7 +87,7 @@ public class FirebaseUserImpl implements FirebaseUser {
 
     @Override
     public boolean isSignedIn() {
-        return !TextUtils.isEmpty(idToken);
+        return !TextUtils.isEmpty(refreshToken);
     }
 
     @Nullable
