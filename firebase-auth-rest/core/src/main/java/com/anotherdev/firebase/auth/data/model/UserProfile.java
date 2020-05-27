@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import org.immutables.gson.Gson;
 import org.immutables.value.Value;
 
+import java.util.Collections;
 import java.util.List;
 
 @Value.Immutable
@@ -13,39 +14,80 @@ import java.util.List;
 @Gson.TypeAdapters
 public interface UserProfile {
 
+    @Value.Default
     @SerializedName("localId")
-    String getLocalId();
+    default String getLocalId() {
+        return "";
+    }
 
+    @Value.Default
     @SerializedName("email")
-    String getEmail();
+    default String getEmail() {
+        return "";
+    }
 
+    @Value.Default
     @SerializedName("emailVerified")
-    boolean isEmailVerified();
+    default boolean isEmailVerified() {
+        return false;
+    }
 
+    @Value.Default
     @SerializedName("disabled")
-    boolean isDisabled();
+    default boolean isDisabled() {
+        return false;
+    }
 
+    @Value.Default
     @SerializedName("customAuth")
-    boolean isCustomAuth();
+    default boolean isCustomAuth() {
+        return false;
+    }
 
+    @Value.Default
     @SerializedName("displayName")
-    String getDisplayName();
+    default String getDisplayName() {
+        return "";
+    }
 
+    @Value.Default
     @SerializedName("providerUserInfo")
-    List<UserInfo> providerUserInfo();
+    default List<UserInfo> providerUserInfo() {
+        return Collections.emptyList();
+    }
 
+    @Value.Default
     @SerializedName("photoUrl")
-    String getPhotoUrl();
+    default String getPhotoUrl() {
+        return "";
+    }
 
+    @Value.Default
     @SerializedName("validSince")
-    String getValidSince();
+    default String getValidSince() {
+        return "";
+    }
 
+    @Value.Default
     @SerializedName("lastLoginAt")
-    String getLastLoginAt();
+    default String getLastLoginAt() {
+        return "";
+    }
 
+    @Value.Default
     @SerializedName("createdAt")
-    String getCreatedAt();
+    default String getCreatedAt() {
+        return "";
+    }
 
+    @Value.Default
     @SerializedName("lastRefreshAt")
-    String getLastRefreshAt();
+    default String getLastRefreshAt() {
+        return "";
+    }
+
+
+    static ImmutableUserProfile.Builder builder() {
+        return ImmutableUserProfile.builder();
+    }
 }
