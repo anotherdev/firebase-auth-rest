@@ -17,6 +17,7 @@ import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.RestAuthProvider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
+import com.anotherdev.firebase.auth.util.FarGson;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.google.firebase.FirebaseApp;
 import com.google.gson.JsonElement;
@@ -38,15 +39,34 @@ public class FirebaseUserImpl implements FirebaseUser {
     @NonNull
     JsonObject userInfo;
 
+    @SuppressWarnings("NullableProblems")
+    @NonNull
+    FirebaseAuthData firebaseAuthData;
+
     @Nullable
     transient FirebaseAuth auth;
 
+
+    FirebaseUserImpl() {
+        userInfo = new JsonObject();
+        firebaseAuthData = new FirebaseAuthData();
+    }
 
     FirebaseUserImpl(@Nullable String appName, @Nullable String idToken, @Nullable String refreshToken) {
         this.appName = appName;
         this.idToken = idToken;
         this.refreshToken = refreshToken;
-        userInfo = IdTokenParser.parseIdToken(idToken);
+        this.userInfo = IdTokenParser.parseIdToken(idToken);
+
+        try {
+            firebaseAuthData = FarGson.get().fromJson(userInfo.get("firebase"), FirebaseAuthData.class);
+        } catch (Exception e) {
+            Timber.e(e);
+        } finally {
+            if (firebaseAuthData == null) {
+                firebaseAuthData = new FirebaseAuthData();
+            }
+        }
     }
 
     @NonNull
@@ -81,10 +101,15 @@ public class FirebaseUserImpl implements FirebaseUser {
         return refreshToken;
     }
 
+    @NonNull
+    public JsonObject getUserInfo() {
+        return userInfo;
+    }
+
     @Nullable
-    private String getAsString(String key) {
+    private static String getAsString(JsonObject json, String key) {
         try {
-            JsonElement element = userInfo.get(key);
+            JsonElement element = json.get(key);
             return element != null ? element.getAsString() : null;
         } catch (RuntimeException e) {
             Timber.e(e);
@@ -95,19 +120,24 @@ public class FirebaseUserImpl implements FirebaseUser {
     @Nullable
     @Override
     public String getUid() {
-        return getAsString("user_id");
+        return getAsString(userInfo, "user_id");
     }
 
     @Nullable
     @Override
     public String getDisplayName() {
-        return getAsString("name");
+        return getAsString(userInfo, "name");
     }
 
     @Nullable
     @Override
     public String getEmail() {
-        return getAsString("email");
+        return getAsString(userInfo, "email");
+    }
+
+    @Override
+    public boolean isAnonymous() {
+        return firebaseAuthData.getIdentities().isEmpty();
     }
 
     @NonNull
