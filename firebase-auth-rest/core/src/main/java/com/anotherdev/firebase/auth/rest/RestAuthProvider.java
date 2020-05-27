@@ -255,17 +255,22 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     }
 
     private SignInResponse getAccountInfo(SignInResponse signInResponse) {
+        getAccountInfo(signInResponse.getIdToken());
+        return signInResponse;
+    }
+
+    public void getAccountInfo(@NonNull String idToken) {
         GetAccountInfoRequest request = GetAccountInfoRequest.builder()
-                .idToken(signInResponse.getIdToken())
+                .idToken(idToken)
                 .build();
         GetAccountInfoResponse accountInfo = RestAuthApi.auth()
-                .getAccounts(request).blockingGet();
+                .getAccounts(request)
+                .blockingGet();
 
         Data dataStore = Data.from(app.getApplicationContext());
         for (UserProfile profile : accountInfo.getUsers()) {
             final String uid = profile.getLocalId();
             dataStore.getUserProfile(uid).set(profile);
         }
-        return signInResponse;
     }
 }

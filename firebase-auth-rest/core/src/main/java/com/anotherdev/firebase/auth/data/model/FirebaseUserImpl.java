@@ -192,6 +192,19 @@ public class FirebaseUserImpl implements FirebaseUser {
 
     @NonNull
     @Override
+    public Completable reload() {
+        return Completable.fromAction(() -> {
+            if (idToken != null) {
+                getAuthInternal().getAccountInfo(idToken);
+            } else {
+                String error = String.format("idToken is null. Cannot reload user: %s", getUid());
+                throw new IllegalStateException(error);
+            }
+        });
+    }
+
+    @NonNull
+    @Override
     public Completable updateProfile(@NonNull UserProfileChangeRequest request) {
         return Single.just(ImmutableUserProfileChangeRequest.copyOf(request))
                 .map(req -> req.withIdToken(idToken))

@@ -42,6 +42,9 @@ public interface FirebaseUser {
     Single<SignInResponse> reauthenticate(@NonNull AuthCredential credential);
 
     @NonNull
+    Completable reload();
+
+    @NonNull
     Completable updateProfile(@NonNull UserProfileChangeRequest request);
 
     @NonNull
