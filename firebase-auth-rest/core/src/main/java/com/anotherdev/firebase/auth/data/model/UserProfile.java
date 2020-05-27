@@ -9,10 +9,7 @@ import org.immutables.value.Value;
 import java.util.List;
 
 @Value.Immutable
-@Value.Style(
-        strictBuilder = true,
-        visibility = Value.Style.ImplementationVisibility.PACKAGE
-)
+@Value.Style(strictBuilder = true)
 @Gson.TypeAdapters
 public interface UserProfile {
 
