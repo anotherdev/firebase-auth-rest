@@ -2,8 +2,8 @@ ext {
     // Manifest version information!
     def versionMajor = 0
     def versionMinor = 1
-    def versionPatch = 0
-    def versionBuild = 2 // bump for dogfood builds, public betas, etc.
+    def versionPatch = 3
+    def versionBuild = 0 // bump for dogfood builds, public betas, etc.
 
     // Eko SDK version
     versionCode = (versionMajor * 100 + versionMinor) * 100 + versionPatch
@@ -28,6 +28,7 @@ ext {
     androidxAppCompatVersion = '1.1.0'
     androidxCoreKtxVersion = '1.2.0'
     androidxLifecycleVersion = '2.2.0'
+    firebaseBomVersion = '25.3.1'
     gsonVersion = '2.8.6'
     immutablesVersion = '2.8.2'
     okhttpVersion = '4.4.1'

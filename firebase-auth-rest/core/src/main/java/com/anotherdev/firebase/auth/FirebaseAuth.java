@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
 import com.google.firebase.FirebaseApp;
 
 import io.reactivex.rxjava3.annotations.CheckReturnValue;
@@ -52,6 +54,10 @@ public interface FirebaseAuth {
     @NonNull
     @CheckReturnValue
     Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull IdpAuthCredential credential);
+
+    @NonNull
+    @CheckReturnValue
+    Single<SendPasswordResetEmailResponse> sendPasswordResetEmail(SendPasswordResetEmailRequest request);
 
     void signOut();
 }
