@@ -25,6 +25,7 @@ import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.util.FarGson;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -36,7 +37,10 @@ import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.yarolegovich.lovelydialog.LovelyTextInputDialog;
 
 import butterknife.BindView;
@@ -109,7 +113,48 @@ public class LoginActivity extends BaseActivity {
                         .requestIdToken(getString(R.string.default_web_client_id))
                         .requestEmail()
                         .build());
+
+        FirebaseRemoteConfigSettings settings = new FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(60)
+                .build();
+
+        Log.e("remote", "Firebase Remote Config");
+        OnFailureListener logOnFailure = e -> Log.e("remote", e.getMessage(), e);
+
+        config.setConfigSettingsAsync(settings)
+                .addOnFailureListener(logOnFailure)
+                .addOnSuccessListener(new OnSuccessListener<Void>("setConfigSettingsAsync") {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        super.onSuccess(aVoid);
+                        config.fetchAndActivate()
+                                .addOnFailureListener(logOnFailure)
+                                .addOnCompleteListener(task -> Log.e("remote", "onComplete isSuccessful: " + task.isSuccessful()))
+                                .addOnSuccessListener(new OnSuccessListener<Boolean>("fetchAndActivate") {
+                                    @Override
+                                    public void onSuccess(Boolean aBoolean) {
+                                        super.onSuccess(aBoolean);
+                                        Log.e("remote", "hello: " + config.getString("hello"));
+                                    }
+                                });
+                    }
+                });
     }
+
+    private final FirebaseRemoteConfig config = FirebaseRemoteConfig.getInstance();
+    static class OnSuccessListener<T> implements com.google.android.gms.tasks.OnSuccessListener<T> {
+        final String name;
+
+        OnSuccessListener(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public void onSuccess(T t) {
+            Log.e("remote", String.format("%s onSuccess: %s", name, FarGson.get().toJson(t)));
+        }
+    }
+
 
     @Override
     protected void onResume() {
