@@ -1,6 +1,7 @@
 package com.anotherdev.sample.firebase.auth;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -83,9 +84,11 @@ public class LoginActivity extends BaseActivity {
 
         firebaseAuth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
 
-        String libInfo = String.format("Library: %s %s",
+        String libInfo = String.format("Library: %s %s\nBuildType: %s\nHash: %s",
                 getString(com.anotherdev.firebase.auth.core.R.string.anotherdev_firebase_auth_rest_sdk_name),
-                com.anotherdev.firebase.auth.core.BuildConfig.VERSION_NAME);
+                com.anotherdev.firebase.auth.core.BuildConfig.VERSION_NAME,
+                com.anotherdev.firebase.auth.core.BuildConfig.BUILD_TYPE,
+                com.anotherdev.firebase.auth.core.BuildConfig.GIT_SHA);
         authLibraryTextView.setText(libInfo);
 
         onDestroy.add(firebaseAuth.currentUser()
@@ -101,7 +104,11 @@ public class LoginActivity extends BaseActivity {
                 })
                 .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
 
-        String appInfo = String.format("%s\n%s", getString(R.string.app_title), BuildConfig.VERSION_NAME);
+        final boolean isDebugBuild = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        String appInfo = String.format("%s\n%s\nBuildType: %s",
+                getString(R.string.app_title),
+                BuildConfig.VERSION_NAME,
+                isDebugBuild ? "debug" : "release");
         appInfoTextView.setText(appInfo);
 
         googleSignInClient = GoogleSignIn.getClient(this,
