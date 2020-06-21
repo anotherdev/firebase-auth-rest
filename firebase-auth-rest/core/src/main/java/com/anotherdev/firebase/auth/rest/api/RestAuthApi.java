@@ -1,5 +1,8 @@
 package com.anotherdev.firebase.auth.rest.api;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+
 import com.anotherdev.firebase.auth.init.AppContext;
 import com.anotherdev.firebase.auth.util.FarGson;
 
@@ -9,7 +12,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.anotherdev.firebase.auth.core.BuildConfig.DEBUG;
 import static okhttp3.logging.HttpLoggingInterceptor.Level.BASIC;
 import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
 
@@ -20,9 +22,11 @@ public final class RestAuthApi {
 
 
     private RestAuthApi() {
+        Context context = AppContext.get();
+        boolean isDebugBuild = (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new HttpLoggingInterceptor().setLevel(DEBUG ? BODY : BASIC))
-                .addInterceptor(new RestAuthInterceptor(AppContext.get()))
+                .addInterceptor(new HttpLoggingInterceptor().setLevel(isDebugBuild ? BODY : BASIC))
+                .addInterceptor(new RestAuthInterceptor(context))
                 .build();
 
         auth = buildApi(okHttpClient, IdentityToolkitApi.BASE_URL, IdentityToolkitApi.class);

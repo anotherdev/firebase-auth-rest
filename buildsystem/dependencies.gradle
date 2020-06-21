@@ -2,7 +2,7 @@ ext {
     // Manifest version information!
     def versionMajor = 0
     def versionMinor = 1
-    def versionPatch = 3
+    def versionPatch = 4
     def versionBuild = 0 // bump for dogfood builds, public betas, etc.
 
     // Eko SDK version
