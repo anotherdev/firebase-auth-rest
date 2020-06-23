@@ -20,12 +20,31 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        debug {
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+
+    Properties properties = new Properties()
+    def propertiesFile = file('../local.properties')
+    if (propertiesFile.canRead()) {
+        properties.load(new FileInputStream(propertiesFile))
+        if (properties != null && properties.containsKey('keystore.file')) {
+            android.signingConfigs.debug.storeFile = file(properties['keystore.file'])
+        }
+    }
+    project.logger.lifecycle('android.signingConfigs.debug.storeFile: ' + android.signingConfigs.debug.storeFile)
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
+            signingConfig signingConfigs.debug
             applicationIdSuffix ".debug"
             versionNameSuffix " - " + defaultConfig.versionCode + " DEBUG"
 
