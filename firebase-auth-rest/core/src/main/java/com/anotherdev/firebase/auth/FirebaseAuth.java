@@ -3,6 +3,7 @@ package com.anotherdev.firebase.auth;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
@@ -45,11 +46,19 @@ public interface FirebaseAuth {
 
     @NonNull
     @CheckReturnValue
+    Single<SignInResponse> signInWithEmailAndPassword(@NonNull EmailAuthCredential credential);
+
+    @NonNull
+    @CheckReturnValue
     Single<SignInResponse> signInWithCredential(@NonNull IdpAuthCredential credential);
 
     @NonNull
     @CheckReturnValue
     Single<SignInResponse> signInWithCustomToken(@NonNull String customToken);
+
+    @NonNull
+    @CheckReturnValue
+    Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull EmailAuthCredential credential);
 
     @NonNull
     @CheckReturnValue

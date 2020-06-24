@@ -11,11 +11,14 @@ import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.data.model.FirebaseUserImpl;
 import com.anotherdev.firebase.auth.data.model.UserProfile;
+import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
+import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoRequest;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoResponse;
+import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithIdpRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
@@ -116,14 +119,15 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     @NonNull
     @Override
     public Single<SignInResponse> signInWithEmailAndPassword(@NonNull String email, @NonNull String password) {
-        SignInWithEmailPasswordRequest request = SignInWithEmailPasswordRequest.builder()
-                .email(email)
-                .password(password)
-                .build();
-        return RestAuthApi.auth()
-                .signInWithEmailAndPassword(request)
-                .map(this::saveCurrentUser)
-                .map(this::getAccountInfo);
+        EmailAuthCredential credential = EmailAuthProvider.getCredential(email, password);
+        return signInWithEmailAndPassword(credential);
+    }
+
+    @NonNull
+    @Override
+    public Single<SignInResponse> signInWithEmailAndPassword(@NonNull EmailAuthCredential credential) {
+        ImmutableSignInWithEmailPasswordRequest.Builder builder = SignInWithEmailPasswordRequest.builder();
+        return performSignInWithEmailAndPassword(builder, credential);
     }
 
     @NonNull
@@ -147,9 +151,29 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
 
     @NonNull
     @Override
+    public Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull EmailAuthCredential credential) {
+        ImmutableSignInWithEmailPasswordRequest.Builder builder = SignInWithEmailPasswordRequest.builder()
+                .idToken(user.getIdToken());
+        return performSignInWithEmailAndPassword(builder, credential);
+    }
+
+    private Single<SignInResponse> performSignInWithEmailAndPassword(@NonNull ImmutableSignInWithEmailPasswordRequest.Builder builder,
+                                                                     @NonNull EmailAuthCredential credential) {
+        SignInWithEmailPasswordRequest request = builder
+                .email(credential.getEmail())
+                .password(credential.getPassword())
+                .build();
+        return RestAuthApi.auth()
+                .signInWithEmailAndPassword(request)
+                .map(this::saveCurrentUser)
+                .map(this::getAccountInfo);
+    }
+
+    @NonNull
+    @Override
     public Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull IdpAuthCredential credential) {
-        String idToken = user.getIdToken();
-        ImmutableSignInWithIdpRequest.Builder builder = SignInWithIdpRequest.builder().idToken(idToken);
+        ImmutableSignInWithIdpRequest.Builder builder = SignInWithIdpRequest.builder()
+                .idToken(user.getIdToken());
         return performSignInWithCredential(builder, credential);
     }
 
