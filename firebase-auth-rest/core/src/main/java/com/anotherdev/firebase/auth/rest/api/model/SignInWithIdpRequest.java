@@ -1,7 +1,5 @@
 package com.anotherdev.firebase.auth.rest.api.model;
 
-import androidx.annotation.Nullable;
-
 import com.google.gson.annotations.SerializedName;
 
 import org.immutables.gson.Gson;
@@ -10,11 +8,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @Value.Style(strictBuilder = true)
 @Gson.TypeAdapters
-public interface SignInWithIdpRequest extends SignInRequest, IdTokenRequest {
-
-    @Nullable
-    @Override
-    String getIdToken();
+public interface SignInWithIdpRequest extends SignInRequest, OptionalIdTokenRequest {
 
     @SerializedName("requestUri")
     String getRequestUri();
