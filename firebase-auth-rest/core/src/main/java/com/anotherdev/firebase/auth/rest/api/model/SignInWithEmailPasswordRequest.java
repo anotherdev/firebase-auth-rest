@@ -8,7 +8,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @Value.Style(strictBuilder = true)
 @Gson.TypeAdapters
-public interface SignInWithEmailPasswordRequest extends SignInRequest {
+public interface SignInWithEmailPasswordRequest extends SignInRequest, OptionalIdTokenRequest {
 
     @SerializedName("email")
     String getEmail();
