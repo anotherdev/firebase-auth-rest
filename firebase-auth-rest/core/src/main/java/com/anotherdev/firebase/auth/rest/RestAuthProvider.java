@@ -153,7 +153,7 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
         return performSignInWithCredential(builder, credential);
     }
 
-    private Single<SignInResponse> performSignInWithCredential(ImmutableSignInWithIdpRequest.Builder builder,
+    private Single<SignInResponse> performSignInWithCredential(@NonNull ImmutableSignInWithIdpRequest.Builder builder,
                                                                @NonNull IdpAuthCredential credential ) {
         SignInWithIdpRequest request = builder
                 .requestUri(credential.getRequestUri(this))
