@@ -11,6 +11,7 @@ import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.data.model.FirebaseUserImpl;
 import com.anotherdev.firebase.auth.data.model.UserProfile;
+import com.anotherdev.firebase.auth.internal.CustomFirebaseExceptions;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
@@ -28,6 +29,7 @@ import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordReques
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.anotherdev.firebase.auth.util.RxUtil;
+import com.anotherdev.firebase.auth.util.Strings;
 import com.f2prateek.rx.preferences2.Preference;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -186,7 +188,23 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
         return RestAuthApi.auth()
                 .signInWithCredential(request)
                 .map(this::saveCurrentUser)
-                .map(this::getAccountInfo);
+                .map(this::getAccountInfo)
+                .onErrorResumeNext(e -> {
+                    final String originalMessage = Strings.nullToEmpty(e.getMessage());
+                    if (e instanceof IllegalStateException
+                            && originalMessage.contains("required attributes are not set")
+                            && originalMessage.contains("refreshToken")) {
+                        Timber.i(e, "Firebase return 200 but without refresh token");
+                        String baseErrorMessage = String.format("Sign in with %s failed.", credential.getProvider());
+                        StringBuilder error = new StringBuilder(baseErrorMessage);
+                        if (!isSignedIn()) {
+                            error.append(" Maybe the account is not properly linked.");
+                        }
+                        return Single.error(CustomFirebaseExceptions.createCustom(400, error.toString()));
+                    } else {
+                        return Single.error(e);
+                    }
+                });
     }
 
     @NonNull
