@@ -11,11 +11,15 @@ import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.data.model.FirebaseUserImpl;
 import com.anotherdev.firebase.auth.data.model.UserProfile;
+import com.anotherdev.firebase.auth.internal.CustomFirebaseExceptions;
+import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
+import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoRequest;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoResponse;
+import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithIdpRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
@@ -25,6 +29,7 @@ import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordReques
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.anotherdev.firebase.auth.util.RxUtil;
+import com.anotherdev.firebase.auth.util.Strings;
 import com.f2prateek.rx.preferences2.Preference;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -116,14 +121,15 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     @NonNull
     @Override
     public Single<SignInResponse> signInWithEmailAndPassword(@NonNull String email, @NonNull String password) {
-        SignInWithEmailPasswordRequest request = SignInWithEmailPasswordRequest.builder()
-                .email(email)
-                .password(password)
-                .build();
-        return RestAuthApi.auth()
-                .signInWithEmailAndPassword(request)
-                .map(this::saveCurrentUser)
-                .map(this::getAccountInfo);
+        EmailAuthCredential credential = EmailAuthProvider.getCredential(email, password);
+        return signInWithEmailAndPassword(credential);
+    }
+
+    @NonNull
+    @Override
+    public Single<SignInResponse> signInWithEmailAndPassword(@NonNull EmailAuthCredential credential) {
+        ImmutableSignInWithEmailPasswordRequest.Builder builder = SignInWithEmailPasswordRequest.builder();
+        return performSignInWithEmailAndPassword(builder, credential);
     }
 
     @NonNull
@@ -147,13 +153,33 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
 
     @NonNull
     @Override
+    public Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull EmailAuthCredential credential) {
+        ImmutableSignInWithEmailPasswordRequest.Builder builder = SignInWithEmailPasswordRequest.builder()
+                .idToken(user.getIdToken());
+        return performSignInWithEmailAndPassword(builder, credential);
+    }
+
+    private Single<SignInResponse> performSignInWithEmailAndPassword(@NonNull ImmutableSignInWithEmailPasswordRequest.Builder builder,
+                                                                     @NonNull EmailAuthCredential credential) {
+        SignInWithEmailPasswordRequest request = builder
+                .email(credential.getEmail())
+                .password(credential.getPassword())
+                .build();
+        return RestAuthApi.auth()
+                .signInWithEmailAndPassword(request)
+                .map(this::saveCurrentUser)
+                .map(this::getAccountInfo);
+    }
+
+    @NonNull
+    @Override
     public Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull IdpAuthCredential credential) {
-        String idToken = user.getIdToken();
-        ImmutableSignInWithIdpRequest.Builder builder = SignInWithIdpRequest.builder().idToken(idToken);
+        ImmutableSignInWithIdpRequest.Builder builder = SignInWithIdpRequest.builder()
+                .idToken(user.getIdToken());
         return performSignInWithCredential(builder, credential);
     }
 
-    private Single<SignInResponse> performSignInWithCredential(ImmutableSignInWithIdpRequest.Builder builder,
+    private Single<SignInResponse> performSignInWithCredential(@NonNull ImmutableSignInWithIdpRequest.Builder builder,
                                                                @NonNull IdpAuthCredential credential ) {
         SignInWithIdpRequest request = builder
                 .requestUri(credential.getRequestUri(this))
@@ -162,7 +188,23 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
         return RestAuthApi.auth()
                 .signInWithCredential(request)
                 .map(this::saveCurrentUser)
-                .map(this::getAccountInfo);
+                .map(this::getAccountInfo)
+                .onErrorResumeNext(e -> {
+                    final String originalMessage = Strings.nullToEmpty(e.getMessage());
+                    if (e instanceof IllegalStateException
+                            && originalMessage.contains("required attributes are not set")
+                            && originalMessage.contains("refreshToken")) {
+                        Timber.i(e, "Firebase return 200 but without refresh token");
+                        String baseErrorMessage = String.format("Sign in with %s failed.", credential.getProvider());
+                        StringBuilder error = new StringBuilder(baseErrorMessage);
+                        if (!isSignedIn()) {
+                            error.append(" Maybe the account is not properly linked.");
+                        }
+                        return Single.error(CustomFirebaseExceptions.createCustom(400, error.toString()));
+                    } else {
+                        return Single.error(e);
+                    }
+                });
     }
 
     @NonNull

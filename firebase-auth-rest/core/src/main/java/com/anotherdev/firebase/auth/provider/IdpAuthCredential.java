@@ -12,6 +12,7 @@ public interface IdpAuthCredential extends AuthCredential {
     @NonNull
     String getPostBody();
 
+    @Deprecated
     default boolean returnIdpCredential() {
         return true;
     }

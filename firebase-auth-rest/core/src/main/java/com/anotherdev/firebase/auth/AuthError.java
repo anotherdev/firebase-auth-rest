@@ -33,9 +33,12 @@ public class AuthError {
     AuthError() {
     }
 
-    AuthError(int code, String message) {
+    AuthError(int code, @Nullable Throwable cause) {
         this.code = code;
-        this.message = message;
+        if (cause != null) {
+            this.cause = cause.getCause();
+            this.message = cause.getMessage();
+        }
     }
 
     public int getCode() {
@@ -96,7 +99,7 @@ public class AuthError {
             }
             cause = cause.getCause();
         }
-        return t != null ? new AuthError(ERROR_CLIENT, t.toString()) : UNKNOWN;
+        return new AuthError(ERROR_CLIENT, t);
     }
 
     private static boolean isClientSideNetworkError(@NonNull Throwable t) {
