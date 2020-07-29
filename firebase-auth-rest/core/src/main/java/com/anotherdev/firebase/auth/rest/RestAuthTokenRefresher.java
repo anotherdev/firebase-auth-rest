@@ -39,7 +39,7 @@ public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserve
     }
 
     @NonNull
-    RestAuthProvider getAuth() {
+    public RestAuthProvider getAuth() {
         return auth;
     }
 
