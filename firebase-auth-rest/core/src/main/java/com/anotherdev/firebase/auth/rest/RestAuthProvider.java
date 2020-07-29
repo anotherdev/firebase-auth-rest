@@ -1,5 +1,6 @@
 package com.anotherdev.firebase.auth.rest;
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -64,6 +65,19 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     public RestAuthProvider(FirebaseApp app) {
         this.app = app;
         userStore = Data.from(app.getApplicationContext()).getCurrentUser(SIGNED_OUT);
+        initIdTokenBroadcast();
+    }
+
+    @SuppressLint("CheckResult")
+    private void initIdTokenBroadcast() {
+        //noinspection ResultOfMethodCallIgnored
+        userStore.asObservable()
+                .skip(1)
+                .subscribe(user -> {
+                    for (IdTokenListener listener : listeners) {
+                        listener.onIdTokenChanged(new InternalTokenResult(user.getIdToken()));
+                    }
+                }, RxUtil.ON_ERROR_LOG_V2);
     }
 
     @NonNull
@@ -290,10 +304,6 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
 
         FirebaseUserImpl user = FirebaseUserImpl.from(app.getName(), idToken, refreshToken);
         userStore.set(user);
-
-        for (IdTokenListener l : listeners) {
-            l.onIdTokenChanged(new InternalTokenResult(idToken));
-        }
     }
 
     private SignInResponse getAccountInfo(SignInResponse signInResponse) {
