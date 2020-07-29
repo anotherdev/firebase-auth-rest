@@ -68,7 +68,7 @@ dependencies {
     implementation 'com.f2prateek.rx.preferences2:rx-preferences:2.0.0'
 
     implementation "com.github.akarnokd:rxjava3-bridge:3.0.0"
-    implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0"
+    implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0" // FIXME migrate to official retrofit rxjava 3 adapter
 
     api "com.google.code.gson:gson:$gsonVersion"
 
