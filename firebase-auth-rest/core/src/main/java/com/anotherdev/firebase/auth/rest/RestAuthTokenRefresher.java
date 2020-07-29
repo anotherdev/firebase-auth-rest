@@ -25,6 +25,7 @@ public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserve
     private static final long MAX_RETRY_BACKOFF = MILLISECONDS.convert(5, MINUTES);
 
     private final Handler handler = new Handler();
+    @NonNull
     private final RestAuthProvider auth;
 
     private String ownerName;
@@ -33,8 +34,13 @@ public class RestAuthTokenRefresher implements IdTokenListener, LifecycleObserve
     private String lastToken;
 
 
-    public RestAuthTokenRefresher(RestAuthProvider auth) {
+    public RestAuthTokenRefresher(@NonNull RestAuthProvider auth) {
         this.auth = auth;
+    }
+
+    @NonNull
+    RestAuthProvider getAuth() {
+        return auth;
     }
 
     @Override
