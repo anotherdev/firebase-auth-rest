@@ -7,8 +7,6 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 
-import com.anotherdev.firebase.auth.FirebaseAuthRest;
-import com.anotherdev.firebase.auth.util.RxUtil;
 import com.anotherdev.sample.firebase.auth.intent.LoginIntent;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
@@ -16,7 +14,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
-import io.reactivex.rxjava3.internal.functions.Functions;
 import studio.carbonylgroup.textfieldboxes.ExtendedEditText;
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
@@ -63,15 +60,6 @@ public class MainActivity extends BaseActivity {
                 .addValueEventListener(new FarValueEventListener(privateTextFieldBoxes, privateEditText));
         globalPublicListener = globalPublicPath
                 .addValueEventListener(new FarValueEventListener(globalPublicTextFieldBoxes, globalPublicEditText));
-
-        onDestroy.add(FirebaseAuthRest.getInstance(app)
-                .authStateChanges()
-                .doOnNext(auth -> {
-                    Log.w(TAG, "authStateChanges() isSignedIn: " + auth.isSignedIn());
-                    rtdb.goOffline();
-                    rtdb.goOnline();
-                })
-                .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
     }
 
     @Override
