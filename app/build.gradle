@@ -83,6 +83,8 @@ dependencies {
     implementation "com.google.firebase:firebase-analytics"
     implementation "com.google.firebase:firebase-database"
 
+    implementation "com.huawei.hms:hianalytics:5.0.1.300"
+
     //noinspection AnnotationProcessorOnCompilePath
     implementation "com.jakewharton:butterknife:10.2.1"
     annotationProcessor "com.jakewharton:butterknife-compiler:10.2.1"
@@ -96,3 +98,5 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxTestJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxTestEspressoVersion"
 }
+
+apply plugin: 'com.huawei.hms.plugin.analytics'
