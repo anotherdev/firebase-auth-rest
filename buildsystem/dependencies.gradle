@@ -3,7 +3,7 @@ ext {
     def versionMajor = 0
     def versionMinor = 1
     def versionPatch = 6
-    def versionBuild = 0 // bump for dogfood builds, public betas, etc.
+    def versionBuild = 1 // bump for dogfood builds, public betas, etc.
 
     // Eko SDK version
     versionCode = (versionMajor * 100 + versionMinor) * 100 + versionPatch
