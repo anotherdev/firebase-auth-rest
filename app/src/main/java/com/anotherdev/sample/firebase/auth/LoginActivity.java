@@ -167,14 +167,13 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void changePassword(String oldPassword, String newPassword) {
-        FirebaseAuth auth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
-        FirebaseUser user = auth.getCurrentUser();
+        FirebaseUser user = firebaseAuth.getCurrentUser();
 
         if (user != null && user.getEmail() != null) {
             EmailAuthCredential oldCredential = EmailAuthProvider.getCredential(user.getEmail(), oldPassword);
             //noinspection ResultOfMethodCallIgnored
             user.reauthenticate(oldCredential)
-                    .flatMapCompletable(response -> auth.getCurrentUser()
+                    .flatMapCompletable(response -> firebaseAuth.getCurrentUser()
                             .updatePassword(newPassword))
                     .doOnSubscribe(onDestroy::add)
                     .observeOn(AndroidSchedulers.mainThread())

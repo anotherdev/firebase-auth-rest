@@ -22,7 +22,6 @@ import com.anotherdev.firebase.auth.util.RxUtil;
 import com.anotherdev.sample.firebase.auth.intent.LoginIntent;
 import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;
 import com.google.android.gms.common.SupportErrorDialogFragment;
-import com.google.firebase.FirebaseApp;
 import com.yarolegovich.lovelydialog.LovelyInfoDialog;
 
 import java.util.List;
@@ -122,8 +121,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void requestAuthIfNeeded() {
-        FirebaseApp app = FirebaseApp.getInstance();
-        FirebaseAuth auth = FirebaseAuthRest.getInstance(app);
+        FirebaseAuth auth = FirebaseAuthRest.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
 
         if (currentUser == null) {
