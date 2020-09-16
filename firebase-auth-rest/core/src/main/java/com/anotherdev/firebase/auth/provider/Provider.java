@@ -2,7 +2,7 @@ package com.anotherdev.firebase.auth.provider;
 
 import androidx.annotation.NonNull;
 
-public enum Providers {
+public enum Provider {
 
     EMAIL (
             "password",
@@ -51,7 +51,7 @@ public enum Providers {
     private final String signInMethod;
 
 
-    Providers(@NonNull String providerId, @NonNull String signInMethod) {
+    Provider(@NonNull String providerId, @NonNull String signInMethod) {
         this.providerId = providerId;
         this.signInMethod = signInMethod;
     }
