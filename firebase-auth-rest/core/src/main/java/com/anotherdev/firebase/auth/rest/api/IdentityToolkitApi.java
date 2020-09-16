@@ -11,7 +11,9 @@ import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithCustomTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
+import com.anotherdev.firebase.auth.rest.api.model.UnlinkProviderRequest;
 import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
+import com.google.gson.JsonObject;
 
 import io.reactivex.rxjava3.core.Single;
 import retrofit2.http.Body;
@@ -49,4 +51,7 @@ public interface IdentityToolkitApi {
 
     @POST("v1/accounts:update")
     Single<SignInResponse> updatePassword(@Body UserPasswordChangeRequest request);
+
+    @POST("v1/accounts:update")
+    Single<JsonObject> unlink(@Body UnlinkProviderRequest request);
 }
