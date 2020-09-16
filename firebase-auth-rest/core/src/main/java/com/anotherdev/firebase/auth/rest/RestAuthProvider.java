@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseUser;
@@ -306,11 +307,13 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
         userStore.set(user);
     }
 
+    @WorkerThread
     private SignInResponse getAccountInfo(SignInResponse signInResponse) {
         getAccountInfo(signInResponse.getIdToken());
         return signInResponse;
     }
 
+    @WorkerThread
     public void getAccountInfo(@NonNull String idToken) {
         GetAccountInfoRequest request = GetAccountInfoRequest.builder()
                 .idToken(idToken)
