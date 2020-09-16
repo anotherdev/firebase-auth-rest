@@ -10,6 +10,7 @@ import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRespons
 import com.google.firebase.FirebaseApp;
 
 import io.reactivex.rxjava3.annotations.CheckReturnValue;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
@@ -63,6 +64,10 @@ public interface FirebaseAuth {
     @NonNull
     @CheckReturnValue
     Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull IdpAuthCredential credential);
+
+    @NonNull
+    @CheckReturnValue
+    Completable unlink(@NonNull FirebaseUser user, @NonNull String provider);
 
     @NonNull
     @CheckReturnValue

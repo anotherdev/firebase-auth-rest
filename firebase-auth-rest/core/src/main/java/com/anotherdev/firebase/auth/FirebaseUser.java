@@ -42,6 +42,10 @@ public interface FirebaseUser {
 
     @NonNull
     @CheckReturnValue
+    Completable unlink(@NonNull String provider);
+
+    @NonNull
+    @CheckReturnValue
     Single<SignInResponse> reauthenticate(@NonNull AuthCredential credential);
 
     @NonNull

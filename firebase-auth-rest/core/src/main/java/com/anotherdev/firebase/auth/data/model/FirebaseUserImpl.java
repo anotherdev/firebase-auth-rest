@@ -43,9 +43,8 @@ public class FirebaseUserImpl implements FirebaseUser {
     @NonNull
     JsonObject userInfo;
 
-    @SuppressWarnings("NullableProblems")
     @NonNull
-    FirebaseAuthData firebaseAuthData;
+    FirebaseAuthData firebaseAuthData = new FirebaseAuthData();
 
     @Nullable
     transient FirebaseAuth auth;
@@ -54,7 +53,6 @@ public class FirebaseUserImpl implements FirebaseUser {
 
     FirebaseUserImpl() {
         userInfo = new JsonObject();
-        firebaseAuthData = new FirebaseAuthData();
     }
 
     FirebaseUserImpl(@Nullable String appName, @Nullable String idToken, @Nullable String refreshToken) {
@@ -172,6 +170,12 @@ public class FirebaseUserImpl implements FirebaseUser {
             String error = String.format("AuthCredential: %s not supported yet.", credentialClassName);
             return Single.error(new UnsupportedOperationException(error));
         }
+    }
+
+    @NonNull
+    @Override
+    public Completable unlink(@NonNull String provider) {
+        return getAuth().unlink(this, provider);
     }
 
     @NonNull

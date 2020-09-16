@@ -29,6 +29,7 @@ import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithCustomTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
+import com.anotherdev.firebase.auth.rest.api.model.UnlinkProviderRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.anotherdev.firebase.auth.util.Strings;
@@ -48,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.internal.functions.Functions;
@@ -220,6 +222,18 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                         return Single.error(e);
                     }
                 });
+    }
+
+    @NonNull
+    @Override
+    public Completable unlink(@NonNull FirebaseUser user, @NonNull String provider) {
+        UnlinkProviderRequest request = UnlinkProviderRequest.builder()
+                .idToken(user.getIdToken())
+                .addProviders(provider)
+                .build();
+        return RestAuthApi.auth()
+                .unlink(request)
+                .flatMapCompletable(jsonObject -> Completable.complete());
     }
 
     @NonNull
