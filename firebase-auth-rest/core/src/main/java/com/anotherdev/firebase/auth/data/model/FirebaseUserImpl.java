@@ -16,6 +16,7 @@ import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.rest.RestAuthProvider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
@@ -157,6 +158,17 @@ public class FirebaseUserImpl implements FirebaseUser {
     @Override
     public boolean isAnonymous() {
         return firebaseAuthData.getIdentities().isEmpty();
+    }
+
+    @Override
+    public boolean isSignedInWith(@NonNull Provider provider) {
+        String lookingForProviderId = provider.getProviderId();
+        for (UserInfo info : getProviderData()) {
+            if (info != null && lookingForProviderId.equals(info.getProviderId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @NonNull

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.provider.AuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -35,6 +36,8 @@ public interface FirebaseUser {
     List<UserInfo> getProviderData();
 
     boolean isAnonymous();
+
+    boolean isSignedInWith(@NonNull Provider provider);
 
     @NonNull
     @CheckReturnValue
