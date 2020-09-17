@@ -19,13 +19,13 @@ import androidx.core.util.ObjectsCompat;
 import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
-import com.anotherdev.firebase.auth.SignInResponse;
 import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -43,6 +43,7 @@ import com.yarolegovich.lovelydialog.LovelyTextInputDialog;
 import butterknife.BindView;
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.internal.functions.Functions;
@@ -208,7 +209,7 @@ public class LoginActivity extends BaseActivity {
                 signInWithEmailButton,
                 v -> emailConfigureView(
                         signInWithEmailButton,
-                        R.string.sign_in__with_email,
+                        R.string.sign_in_with_email,
                         firebaseAuth::signInWithEmailAndPassword),
                 auth -> signInWithEmailButton.setEnabled(!auth.isSignedIn()));
     }
@@ -242,30 +243,42 @@ public class LoginActivity extends BaseActivity {
                 String token = loginResult.getAccessToken().getToken();
                 IdpAuthCredential credential = FacebookAuthProvider.getCredential(token);
 
-                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                Single<SignInResponse> signInFlow = currentUser == null
-                        ? firebaseAuth.signInWithCredential(credential)
-                        : currentUser.linkWithCredential(credential);
+                Completable signInFlow = user == null
+                        ? firebaseAuth.signInWithCredential(credential).flatMapCompletable(res -> Completable.complete())
+                        : user.linkWithCredential(credential).flatMapCompletable(signInResponse -> user.reload());
 
                 onDestroy.add(signInFlow
                         .observeOn(AndroidSchedulers.mainThread())
+                        .doOnComplete(() -> setButtonText(signInWithFacebookButton, Provider.FACEBOOK, R.string.facebook))
                         .doOnError(e -> {
                             dialog(e);
                             LoginManager.getInstance().logOut();
                         })
-                        .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
+                        .subscribe(() -> {}, RxUtil.ON_ERROR_LOG_V3));
             }
             @Override public void onCancel() { toast("Facebook Login canceled"); }
             @Override public void onError(FacebookException error) { toast(error.getMessage()); }
         });
         setupButton(firebaseAuth,
                 signInWithFacebookButton,
-                v -> facebookLoginButton.performClick(),
+                v -> {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (user != null && user.isSignedInWith(Provider.FACEBOOK)) {
+                        onDestroy.add(user
+                                .unlink(Provider.FACEBOOK.getProviderId())
+                                .andThen(user.reload())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .doOnComplete(() -> setButtonText(signInWithFacebookButton, Provider.FACEBOOK, R.string.facebook))
+                                .subscribe(() -> {}, RxUtil.ON_ERROR_LOG_V3));
+                    } else {
+                        facebookLoginButton.performClick();
+                    }
+                },
                 auth -> {
-                    boolean isLoggedOut = !auth.isSignedIn();
-                    signInWithFacebookButton.setEnabled(isLoggedOut);
-                    if (isLoggedOut) {
+                    setButtonText(signInWithFacebookButton, Provider.FACEBOOK, R.string.facebook);
+                    if (!auth.isSignedIn()) {
                         LoginManager.getInstance().logOut();
                     }
                 });
@@ -294,7 +307,7 @@ public class LoginActivity extends BaseActivity {
                                 .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2))),
                 auth -> {
                     boolean isLoggedOut = !auth.isSignedIn();
-                    signInWithGoogleButton.setEnabled(isLoggedOut);
+                    setButtonText(signInWithGoogleButton, Provider.GOOGLE, R.string.google);
                     if (isLoggedOut) {
                         googleSignInClient.signOut();
                     }
@@ -319,6 +332,19 @@ public class LoginActivity extends BaseActivity {
         onDestroy.add(firebaseAuth.authStateChanges()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(authStateConsumer, RxUtil.ON_ERROR_LOG_V3));
+    }
+
+    private void setButtonText(@NonNull Button button, @NonNull Provider provider, @StringRes int providerName) {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        String name = getString(providerName);
+        if (user != null) {
+            boolean linked = user.isSignedInWith(provider);
+            int text = linked ? R.string.unlink_from_x : R.string.link_with_x;
+            button.setText(getString(text, name));
+        } else {
+            button.setText(getString(R.string.sign_in_with_x, name));
+        }
+        button.setEnabled(true);
     }
 
     @Override

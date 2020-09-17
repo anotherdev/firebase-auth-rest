@@ -66,7 +66,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/auth_sign_in_email_button"
-                android:text="@string/sign_in__with_email"
+                android:text="@string/sign_in_with_email"
                 android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="@android:dimen/app_icon_size" />
@@ -86,7 +86,7 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/auth_sign_in_with_facebook_button"
-                    android:text="@string/sign_in__with_facebook"
+                    android:text="@string/facebook"
                     android:layout_width="match_parent"
                     android:layout_height="@android:dimen/app_icon_size" />
 
@@ -94,7 +94,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/auth_sign_in_with_google_button"
-                android:text="@string/sign_in__with_google"
+                android:text="@string/google"
                 android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="@android:dimen/app_icon_size" />
