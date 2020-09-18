@@ -40,6 +40,6 @@ public interface UserInfo {
     @Value.Default
     @SerializedName("isEmailVerified")
     default boolean isEmailVerified() {
-        return true;
+        return false;
     }
 }
