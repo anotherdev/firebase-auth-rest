@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -130,32 +131,46 @@ public class LoginActivity extends BaseActivity {
         setupLogoutButton(firebaseAuth);
     }
 
-    private void startProfileEditing() {
-        FirebaseUser user = firebaseAuth.getCurrentUser();
+    private void showSimpleTextInputDialog(@Nullable FirebaseUser user,
+                                           @StringRes int topTitle,
+                                           @DrawableRes int icon,
+                                           @Nullable String message,
+                                           @Nullable String initialInput,
+                                           @Nullable LovelyTextInputDialog.OnTextInputConfirmListener listener) {
         if (user != null) {
-            final String oldDisplayName = user.getDisplayName();
             new LovelyTextInputDialog(this)
                     .setTopColorRes(R.color.colorPrimary)
-                    .setTopTitle(R.string.edit_profile)
+                    .setTopTitle(topTitle)
                     .setTopTitleColor(getResources().getColor(android.R.color.white))
-                    .setIcon(R.drawable.ic_edit_white_24dp)
-                    .setMessage("Display Name")
-                    .setInitialInput(oldDisplayName)
-                    .setConfirmButton(android.R.string.ok, newDisplayName -> {
-                        if (!ObjectsCompat.equals(oldDisplayName, newDisplayName)) {
-                            UserProfileChangeRequest request = UserProfileChangeRequest.builder()
-                                    .displayName(newDisplayName)
-                                    .build();
-                            onDestroy.add(user.updateProfile(request)
-                                    .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
-                        } else {
-                            Log.w(TAG, "Same display name. Ignored.");
-                        }
-                    })
+                    .setIcon(icon)
+                    .setMessage(message)
+                    .setInitialInput(initialInput)
+                    .setConfirmButton(android.R.string.ok, listener)
                     .show();
         } else {
             dialog(new IllegalStateException("User null"));
         }
+    }
+
+    private void startProfileEditing() {
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        final String oldDisplayName = user != null ? user.getDisplayName() : null;
+        showSimpleTextInputDialog(user,
+                R.string.edit_profile,
+                R.drawable.ic_edit_white_24dp,
+                "Display Name",
+                oldDisplayName,
+                newDisplayName -> {
+                    if (!ObjectsCompat.equals(oldDisplayName, newDisplayName)) {
+                        UserProfileChangeRequest request = UserProfileChangeRequest.builder()
+                                .displayName(newDisplayName)
+                                .build();
+                        onDestroy.add(user.updateProfile(request)
+                                .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
+                    } else {
+                        Log.w(TAG, "Same display name. Ignored.");
+                    }
+                });
     }
 
     private void startPasswordChange() {
