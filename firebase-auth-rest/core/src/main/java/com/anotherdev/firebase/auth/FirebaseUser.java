@@ -61,5 +61,9 @@ public interface FirebaseUser {
 
     @NonNull
     @CheckReturnValue
+    Completable updateEmail(@NonNull String newEmail);
+
+    @NonNull
+    @CheckReturnValue
     Completable updatePassword(@NonNull String newPassword);
 }

@@ -19,6 +19,7 @@ import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.rest.RestAuthProvider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
+import com.anotherdev.firebase.auth.rest.api.model.UserEmailChangeRequest;
 import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
 import com.anotherdev.firebase.auth.util.FarGson;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
@@ -226,6 +227,19 @@ public class FirebaseUserImpl implements FirebaseUser {
                 .map(req -> req.withIdToken(idToken))
                 .flatMap(req -> RestAuthApi.auth().updateProfile(req))
                 .doOnSuccess(response -> getAuthInternal().getAccessToken(true))
+                .flatMapCompletable(ignored -> Completable.complete());
+    }
+
+    @NonNull
+    @Override
+    public Completable updateEmail(@NonNull String newEmail) {
+        return Single.just(newEmail)
+                .map(email -> UserEmailChangeRequest.builder()
+                        .idToken(idToken)
+                        .email(email)
+                        .build())
+                .flatMap(req -> RestAuthApi.auth().updateEmail(req))
+                .doOnSuccess(response -> getAuthInternal().saveCurrentUser(response))
                 .flatMapCompletable(ignored -> Completable.complete());
     }
 
