@@ -165,7 +165,8 @@ public class LoginActivity extends BaseActivity {
                         UserProfileChangeRequest request = UserProfileChangeRequest.builder()
                                 .displayName(newDisplayName)
                                 .build();
-                        onDestroy.add(user.updateProfile(request)
+                        onDestroy.add(Completable.defer(() -> user.updateProfile(request))
+                                .doOnError(this::dialog)
                                 .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
                     } else {
                         Log.w(TAG, "Same display name. Ignored.");
