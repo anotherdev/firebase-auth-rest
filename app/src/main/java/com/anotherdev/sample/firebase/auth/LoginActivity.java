@@ -166,10 +166,31 @@ public class LoginActivity extends BaseActivity {
                                 .displayName(newDisplayName)
                                 .build();
                         onDestroy.add(Completable.defer(() -> user.updateProfile(request))
+                                .observeOn(AndroidSchedulers.mainThread())
                                 .doOnError(this::dialog)
                                 .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
                     } else {
                         Log.w(TAG, "Same display name. Ignored.");
+                    }
+                });
+    }
+
+    private void startEmailChange() {
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        final String oldEmail = user != null ? user.getEmail() : null;
+        showSimpleTextInputDialog(user,
+                R.string.change_email,
+                R.drawable.ic_email_white_48dp,
+                getString(R.string.email),
+                oldEmail,
+                newEmail -> {
+                    if (!ObjectsCompat.equals(oldEmail, newEmail)) {
+                        onDestroy.add(Completable.defer(() -> user.updateEmail(newEmail))
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .doOnError(this::dialog)
+                                .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
+                    } else {
+                        Log.w(TAG, "Same email. Ignored.");
                     }
                 });
     }
@@ -374,6 +395,9 @@ public class LoginActivity extends BaseActivity {
         final int itemId = item.getItemId();
         if (R.id.action_edit_profile == itemId) {
             startProfileEditing();
+            return true;
+        } else if (R.id.action_change_email == itemId) {
+            startEmailChange();
             return true;
         } else if (R.id.action_change_password == itemId) {
             startPasswordChange();
