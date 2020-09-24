@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
+import androidx.core.util.ObjectsCompat;
 
 import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseUser;
@@ -336,10 +337,22 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 .getAccounts(request)
                 .blockingGet();
 
+        final String currentUserId = userStore.get().getUid();
+
         Data dataStore = Data.from(app.getApplicationContext());
         for (UserProfile profile : accountInfo.getUsers()) {
             final String uid = profile.getLocalId();
             dataStore.getUserProfile(uid).set(profile);
+
+            if (ObjectsCompat.equals(uid, currentUserId)) {
+                try {
+                    FirebaseUserImpl user = userStore.get();
+                    user.getUserInfo().addProperty("far_updatedAt", System.currentTimeMillis());
+                    userStore.set(user);
+                } catch (Exception e) {
+                    Timber.e(e);
+                }
+            }
         }
     }
 }
