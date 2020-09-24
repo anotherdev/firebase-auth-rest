@@ -19,6 +19,8 @@ import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.rest.RestAuthProvider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
+import com.anotherdev.firebase.auth.rest.api.model.SendEmailVerificationRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SendEmailVerificationResponse;
 import com.anotherdev.firebase.auth.rest.api.model.UserEmailChangeRequest;
 import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
 import com.anotherdev.firebase.auth.util.FarGson;
@@ -254,6 +256,17 @@ public class FirebaseUserImpl implements FirebaseUser {
                 .flatMap(req -> RestAuthApi.auth().updatePassword(req))
                 .doOnSuccess(response -> getAuthInternal().saveCurrentUser(response))
                 .flatMapCompletable(ignored -> Completable.complete());
+    }
+
+    @NonNull
+    @Override
+    public Single<SendEmailVerificationResponse> sendEmailVerification() {
+        return Single.defer(() -> {
+            SendEmailVerificationRequest request = SendEmailVerificationRequest.builder()
+                    .idToken(idToken)
+                    .build();
+            return RestAuthApi.auth().sendEmailVerification(request);
+        });
     }
 
     public long getExpirationTime() {

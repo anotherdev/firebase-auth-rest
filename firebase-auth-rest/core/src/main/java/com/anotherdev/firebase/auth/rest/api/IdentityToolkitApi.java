@@ -5,6 +5,8 @@ import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.UserProfileChangeResponse;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoRequest;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoResponse;
+import com.anotherdev.firebase.auth.rest.api.model.SendEmailVerificationRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SendEmailVerificationResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
@@ -43,6 +45,9 @@ public interface IdentityToolkitApi {
 
     @POST("v1/accounts:sendOobCode")
     Single<SendPasswordResetEmailResponse> sendPasswordResetEmail(@Body SendPasswordResetEmailRequest request);
+
+    @POST("v1/accounts:sendOobCode")
+    Single<SendEmailVerificationResponse> sendEmailVerification(@Body SendEmailVerificationRequest request);
 
     @POST("v1/accounts:lookup")
     Single<GetAccountInfoResponse> getAccounts(@Body GetAccountInfoRequest request);
