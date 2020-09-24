@@ -20,6 +20,7 @@ import androidx.core.util.ObjectsCompat;
 import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
+import com.anotherdev.firebase.auth.UserInfo;
 import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
@@ -95,14 +96,24 @@ public class LoginActivity extends BaseActivity {
 
         onDestroy.add(firebaseAuth.currentUser()
                 .doOnNext(user -> {
-                    String userInfo = "SIGNED OUT";
+                    StringBuilder userProfile = new StringBuilder();
                     if (user.isSignedIn()) {
-                        userInfo = String.format("UserId: %s\nEmail: %s\nDisplayName: %s",
+                        userProfile.append(String.format("UserId: %s\nEmail: %s\nDisplayName: %s",
                                 user.getUid(),
                                 user.getEmail(),
-                                user.getDisplayName());
+                                user.getDisplayName()));
+                        for (UserInfo acc : user.getProviderData()) {
+                            userProfile.append(String.format("\n\nProviderId: %s\nUserId: %s\nDisplayName: %s\nEmail: %s (%s)",
+                                    acc.getProviderId(),
+                                    acc.getUid(),
+                                    acc.getDisplayName(),
+                                    acc.getEmail(),
+                                    acc.isEmailVerified() ? "verified" : "not verified"));
+                        }
+                    } else {
+                        userProfile.append("SIGNED OUT");
                     }
-                    authUserTextView.setText(userInfo);
+                    authUserTextView.setText(userProfile.toString());
                 })
                 .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
 
