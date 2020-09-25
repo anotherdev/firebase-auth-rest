@@ -149,6 +149,14 @@ public class FirebaseUserImpl implements FirebaseUser {
         return getAsString(userInfo, "email");
     }
 
+    @Override
+    public boolean isEmailVerified() {
+        String uid = getUid();
+        return getData().getUserProfile(uid != null ? uid : "")
+                .get()
+                .isEmailVerified();
+    }
+
     @NonNull
     @Override
     public List<UserInfo> getProviderData() {

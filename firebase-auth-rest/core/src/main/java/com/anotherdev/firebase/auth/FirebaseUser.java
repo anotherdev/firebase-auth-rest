@@ -33,6 +33,8 @@ public interface FirebaseUser {
     @Nullable
     String getEmail();
 
+    boolean isEmailVerified();
+
     @NonNull
     List<UserInfo> getProviderData();
 

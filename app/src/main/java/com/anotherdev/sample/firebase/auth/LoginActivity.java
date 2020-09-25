@@ -98,9 +98,10 @@ public class LoginActivity extends BaseActivity {
                 .doOnNext(user -> {
                     StringBuilder userProfile = new StringBuilder();
                     if (user.isSignedIn()) {
-                        userProfile.append(String.format("UserId: %s\nEmail: %s\nDisplayName: %s",
+                        userProfile.append(String.format("UserId: %s\nEmail: %s (%s)\nDisplayName: %s",
                                 user.getUid(),
                                 user.getEmail(),
+                                user.isEmailVerified() ? "verified" : "not verified",
                                 user.getDisplayName()));
                         for (UserInfo acc : user.getProviderData()) {
                             userProfile.append(String.format("\n\nProviderId: %s\nUserId: %s\nDisplayName: %s\nEmail: %s (%s)",
