@@ -104,12 +104,11 @@ public class LoginActivity extends BaseActivity {
                                 user.isEmailVerified() ? "verified" : "not verified",
                                 user.getDisplayName()));
                         for (UserInfo acc : user.getProviderData()) {
-                            userProfile.append(String.format("\n\nProviderId: %s\nUserId: %s\nDisplayName: %s\nEmail: %s (%s)",
+                            userProfile.append(String.format("\n\nProviderId: %s\nUserId: %s\nDisplayName: %s\nEmail: %s",
                                     acc.getProviderId(),
                                     acc.getUid(),
                                     acc.getDisplayName(),
-                                    acc.getEmail(),
-                                    acc.isEmailVerified() ? "verified" : "not verified"));
+                                    acc.getEmail()));
                         }
                     } else {
                         userProfile.append("SIGNED OUT");

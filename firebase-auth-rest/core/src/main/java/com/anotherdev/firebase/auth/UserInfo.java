@@ -36,10 +36,4 @@ public interface UserInfo {
     default String getProviderId() {
         return "";
     }
-
-    @Value.Default
-    @SerializedName("isEmailVerified")
-    default boolean isEmailVerified() {
-        return false;
-    }
 }
