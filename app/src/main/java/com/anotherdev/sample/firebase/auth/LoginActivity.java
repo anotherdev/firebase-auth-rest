@@ -206,6 +206,24 @@ public class LoginActivity extends BaseActivity {
                 });
     }
 
+    private void startVerifyEmail() {
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            //noinspection ResultOfMethodCallIgnored
+            user.sendEmailVerification()
+                    .doOnSubscribe(onDestroy::add)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSuccess(response -> {
+                        String msg = String.format("Verification email sent to: %s", response.getEmail());
+                        dialog(getString(R.string.verify_email), msg);
+                    })
+                    .doOnError(this::dialog)
+                    .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
+        } else {
+            dialog(getString(R.string.verify_email), "User signed out");
+        }
+    }
+
     private void startPasswordChange() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
@@ -409,6 +427,9 @@ public class LoginActivity extends BaseActivity {
             return true;
         } else if (R.id.action_change_email == itemId) {
             startEmailChange();
+            return true;
+        } else if (R.id.action_verify_email == itemId) {
+            startVerifyEmail();
             return true;
         } else if (R.id.action_change_password == itemId) {
             startPasswordChange();
