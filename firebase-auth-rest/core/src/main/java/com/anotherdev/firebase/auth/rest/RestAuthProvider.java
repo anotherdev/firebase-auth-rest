@@ -276,17 +276,8 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 source.trySetException(new FirebaseException("Current refresh token is null. Log out"));
                 signOut();
             } else {
-                ExchangeTokenRequest request = ExchangeTokenRequest.builder()
-                        .refreshToken(currentRefreshToken)
-                        .build();
-
                 //noinspection ResultOfMethodCallIgnored
-                RestAuthApi.token()
-                        .exchangeToken(request)
-                        .map(response -> {
-                            saveCurrentUser(response.getIdToken(), response.getRefreshToken());
-                            return response;
-                        })
+                exchangeToken(user)
                         .doOnSuccess(response -> source.trySetResult(getTokenResultLocal(user)))
                         .doOnError(e -> source.trySetException(new Exception(e)))
                         .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
