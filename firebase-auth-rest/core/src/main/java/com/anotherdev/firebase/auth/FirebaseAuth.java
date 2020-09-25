@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
 import com.google.firebase.FirebaseApp;
@@ -28,6 +29,8 @@ public interface FirebaseAuth {
     Observable<FirebaseUser> currentUser();
 
     boolean isSignedIn();
+
+    boolean isSignedInWith(Provider provider);
 
     @NonNull
     @CheckReturnValue

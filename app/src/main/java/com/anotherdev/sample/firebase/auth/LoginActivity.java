@@ -326,7 +326,7 @@ public class LoginActivity extends BaseActivity {
                 },
                 auth -> {
                     setButtonText(signInWithFacebookButton, Provider.FACEBOOK, R.string.facebook);
-                    if (!auth.isSignedIn()) {
+                    if (!auth.isSignedInWith(Provider.FACEBOOK)) {
                         LoginManager.getInstance().logOut();
                     }
                 });

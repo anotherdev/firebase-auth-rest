@@ -18,6 +18,7 @@ import com.anotherdev.firebase.auth.internal.CustomFirebaseExceptions;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoRequest;
@@ -105,6 +106,11 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     @Override
     public boolean isSignedIn() {
         return userStore.isSet();
+    }
+
+    @Override
+    public boolean isSignedInWith(Provider provider) {
+        return isSignedIn() && userStore.get().isSignedInWith(provider);
     }
 
     @NonNull
