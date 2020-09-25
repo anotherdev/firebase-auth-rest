@@ -21,6 +21,7 @@ import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
+import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenResponse;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoRequest;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoResponse;
 import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithEmailPasswordRequest;
@@ -296,6 +297,21 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
         return source.getTask();
     }
 
+    public Single<ExchangeTokenResponse> exchangeToken() {
+        return exchangeToken(userStore.get());
+    }
+
+    public Single<ExchangeTokenResponse> exchangeToken(@NonNull FirebaseUserImpl user) {
+        return Single.fromCallable(user::getRefreshToken)
+                .map(token -> ExchangeTokenRequest.builder().refreshToken(token).build())
+                .flatMap(request -> RestAuthApi.token().exchangeToken(request))
+                .doOnError(e -> Timber.tag("http").e(e))
+                .map(response -> {
+                    saveCurrentUser(response.getIdToken(), response.getRefreshToken());
+                    return response;
+                });
+    }
+
     @Nullable
     @Override
     public String getUid() {
@@ -332,6 +348,10 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     private SignInResponse getAccountInfo(SignInResponse signInResponse) {
         getAccountInfo(signInResponse.getIdToken());
         return signInResponse;
+    }
+
+    public void getAccountInfo() {
+        getAccountInfo(userStore.get().getIdToken());
     }
 
     @WorkerThread

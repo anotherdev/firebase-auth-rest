@@ -220,14 +220,7 @@ public class FirebaseUserImpl implements FirebaseUser {
     @NonNull
     @Override
     public Completable reload() {
-        return Completable.fromAction(() -> {
-            if (idToken != null) {
-                getAuthInternal().getAccountInfo(idToken);
-            } else {
-                String error = String.format("idToken is null. Cannot reload user: %s", getUid());
-                throw new IllegalStateException(error);
-            }
-        });
+        return Completable.fromAction(() -> getAuthInternal().getAccountInfo());
     }
 
     @NonNull
@@ -236,8 +229,8 @@ public class FirebaseUserImpl implements FirebaseUser {
         return Single.just(ImmutableUserProfileChangeRequest.copyOf(request))
                 .map(req -> req.withIdToken(idToken))
                 .flatMap(req -> RestAuthApi.auth().updateProfile(req))
-                .doOnSuccess(response -> getAuthInternal().getAccessToken(true))
-                .flatMapCompletable(ignored -> Completable.complete());
+                .flatMap(response -> getAuthInternal().exchangeToken())
+                .flatMapCompletable(ignored -> reload());
     }
 
     @NonNull
@@ -249,8 +242,8 @@ public class FirebaseUserImpl implements FirebaseUser {
                         .email(email)
                         .build())
                 .flatMap(req -> RestAuthApi.auth().updateEmail(req))
-                .doOnSuccess(response -> getAuthInternal().saveCurrentUser(response))
-                .flatMapCompletable(ignored -> Completable.complete());
+                .map(response -> getAuthInternal().saveCurrentUser(response))
+                .flatMapCompletable(response -> reload());
     }
 
     @NonNull
