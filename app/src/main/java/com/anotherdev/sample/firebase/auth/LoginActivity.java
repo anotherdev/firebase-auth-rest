@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -19,13 +20,14 @@ import androidx.core.util.ObjectsCompat;
 import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseAuthRest;
 import com.anotherdev.firebase.auth.FirebaseUser;
-import com.anotherdev.firebase.auth.SignInResponse;
+import com.anotherdev.firebase.auth.UserInfo;
 import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -43,6 +45,7 @@ import com.yarolegovich.lovelydialog.LovelyTextInputDialog;
 import butterknife.BindView;
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.internal.functions.Functions;
@@ -93,14 +96,24 @@ public class LoginActivity extends BaseActivity {
 
         onDestroy.add(firebaseAuth.currentUser()
                 .doOnNext(user -> {
-                    String userInfo = "SIGNED OUT";
+                    StringBuilder userProfile = new StringBuilder();
                     if (user.isSignedIn()) {
-                        userInfo = String.format("UserId: %s\nEmail: %s\nDisplayName: %s",
+                        userProfile.append(String.format("UserId: %s\nEmail: %s (%s)\nDisplayName: %s",
                                 user.getUid(),
                                 user.getEmail(),
-                                user.getDisplayName());
+                                user.isEmailVerified() ? "verified" : "not verified",
+                                user.getDisplayName()));
+                        for (UserInfo acc : user.getProviderData()) {
+                            userProfile.append(String.format("\n\nProviderId: %s\nUserId: %s\nDisplayName: %s\nEmail: %s",
+                                    acc.getProviderId(),
+                                    acc.getUid(),
+                                    acc.getDisplayName(),
+                                    acc.getEmail()));
+                        }
+                    } else {
+                        userProfile.append("SIGNED OUT");
                     }
-                    authUserTextView.setText(userInfo);
+                    authUserTextView.setText(userProfile.toString());
                 })
                 .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
 
@@ -129,31 +142,85 @@ public class LoginActivity extends BaseActivity {
         setupLogoutButton(firebaseAuth);
     }
 
-    private void startProfileEditing() {
-        FirebaseUser user = firebaseAuth.getCurrentUser();
+    private void showSimpleTextInputDialog(@Nullable FirebaseUser user,
+                                           @StringRes int topTitle,
+                                           @DrawableRes int icon,
+                                           @Nullable String message,
+                                           @Nullable String initialInput,
+                                           @Nullable LovelyTextInputDialog.OnTextInputConfirmListener listener) {
         if (user != null) {
-            final String oldDisplayName = user.getDisplayName();
             new LovelyTextInputDialog(this)
                     .setTopColorRes(R.color.colorPrimary)
-                    .setTopTitle(R.string.edit_profile)
+                    .setTopTitle(topTitle)
                     .setTopTitleColor(getResources().getColor(android.R.color.white))
-                    .setIcon(R.drawable.ic_edit_white_24dp)
-                    .setMessage("Display Name")
-                    .setInitialInput(oldDisplayName)
-                    .setConfirmButton(android.R.string.ok, newDisplayName -> {
-                        if (!ObjectsCompat.equals(oldDisplayName, newDisplayName)) {
-                            UserProfileChangeRequest request = UserProfileChangeRequest.builder()
-                                    .displayName(newDisplayName)
-                                    .build();
-                            onDestroy.add(user.updateProfile(request)
-                                    .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
-                        } else {
-                            Log.w(TAG, "Same display name. Ignored.");
-                        }
-                    })
+                    .setIcon(icon)
+                    .setMessage(message)
+                    .setInitialInput(initialInput)
+                    .setConfirmButton(android.R.string.ok, listener)
                     .show();
         } else {
             dialog(new IllegalStateException("User null"));
+        }
+    }
+
+    private void startProfileEditing() {
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        final String oldDisplayName = user != null ? user.getDisplayName() : null;
+        showSimpleTextInputDialog(user,
+                R.string.edit_profile,
+                R.drawable.ic_edit_white_24dp,
+                "Display Name",
+                oldDisplayName,
+                newDisplayName -> {
+                    if (!ObjectsCompat.equals(oldDisplayName, newDisplayName)) {
+                        UserProfileChangeRequest request = UserProfileChangeRequest.builder()
+                                .displayName(newDisplayName)
+                                .build();
+                        onDestroy.add(Completable.defer(() -> user.updateProfile(request))
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .doOnError(this::dialog)
+                                .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
+                    } else {
+                        Log.w(TAG, "Same display name. Ignored.");
+                    }
+                });
+    }
+
+    private void startEmailChange() {
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        final String oldEmail = user != null ? user.getEmail() : null;
+        showSimpleTextInputDialog(user,
+                R.string.change_email,
+                R.drawable.ic_email_white_48dp,
+                getString(R.string.email),
+                oldEmail,
+                newEmail -> {
+                    if (!ObjectsCompat.equals(oldEmail, newEmail)) {
+                        onDestroy.add(Completable.defer(() -> user.updateEmail(newEmail))
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .doOnError(this::dialog)
+                                .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3));
+                    } else {
+                        Log.w(TAG, "Same email. Ignored.");
+                    }
+                });
+    }
+
+    private void startVerifyEmail() {
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            //noinspection ResultOfMethodCallIgnored
+            user.sendEmailVerification()
+                    .doOnSubscribe(onDestroy::add)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSuccess(response -> {
+                        String msg = String.format("Verification email sent to: %s", response.getEmail());
+                        dialog(getString(R.string.verify_email), msg);
+                    })
+                    .doOnError(this::dialog)
+                    .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
+        } else {
+            dialog(getString(R.string.verify_email), "User signed out");
         }
     }
 
@@ -167,14 +234,13 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void changePassword(String oldPassword, String newPassword) {
-        FirebaseAuth auth = FirebaseAuthRest.getInstance(FirebaseApp.getInstance());
-        FirebaseUser user = auth.getCurrentUser();
+        FirebaseUser user = firebaseAuth.getCurrentUser();
 
         if (user != null && user.getEmail() != null) {
             EmailAuthCredential oldCredential = EmailAuthProvider.getCredential(user.getEmail(), oldPassword);
             //noinspection ResultOfMethodCallIgnored
             user.reauthenticate(oldCredential)
-                    .flatMapCompletable(response -> auth.getCurrentUser()
+                    .flatMapCompletable(response -> firebaseAuth.getCurrentUser()
                             .updatePassword(newPassword))
                     .doOnSubscribe(onDestroy::add)
                     .observeOn(AndroidSchedulers.mainThread())
@@ -182,6 +248,13 @@ public class LoginActivity extends BaseActivity {
                     .doOnError(this::dialog)
                     .subscribe(Functions.EMPTY_ACTION, RxUtil.ON_ERROR_LOG_V3);
         }
+    }
+
+    private Completable unlinkProvider(@NonNull FirebaseUser user, @NonNull Button button, @NonNull Provider provider, @StringRes int providerName) {
+        return user.unlink(provider.getProviderId())
+                .andThen(user.reload())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete(() -> setButtonText(button, provider, providerName));
     }
 
     private void setupSignInAnonymouslyButton(FirebaseAuth firebaseAuth) {
@@ -209,7 +282,7 @@ public class LoginActivity extends BaseActivity {
                 signInWithEmailButton,
                 v -> emailConfigureView(
                         signInWithEmailButton,
-                        R.string.sign_in__with_email,
+                        R.string.sign_in_with_email,
                         firebaseAuth::signInWithEmailAndPassword),
                 auth -> signInWithEmailButton.setEnabled(!auth.isSignedIn()));
     }
@@ -243,30 +316,38 @@ public class LoginActivity extends BaseActivity {
                 String token = loginResult.getAccessToken().getToken();
                 IdpAuthCredential credential = FacebookAuthProvider.getCredential(token);
 
-                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                Single<SignInResponse> signInFlow = currentUser == null
-                        ? firebaseAuth.signInWithCredential(credential)
-                        : currentUser.linkWithCredential(credential);
+                Completable signInFlow = user == null
+                        ? firebaseAuth.signInWithCredential(credential).flatMapCompletable(res -> Completable.complete())
+                        : user.linkWithCredential(credential).flatMapCompletable(signInResponse -> user.reload());
 
                 onDestroy.add(signInFlow
                         .observeOn(AndroidSchedulers.mainThread())
+                        .doOnComplete(() -> setButtonText(signInWithFacebookButton, Provider.FACEBOOK, R.string.facebook))
                         .doOnError(e -> {
                             dialog(e);
                             LoginManager.getInstance().logOut();
                         })
-                        .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
+                        .subscribe(() -> {}, RxUtil.ON_ERROR_LOG_V3));
             }
             @Override public void onCancel() { toast("Facebook Login canceled"); }
             @Override public void onError(FacebookException error) { toast(error.getMessage()); }
         });
         setupButton(firebaseAuth,
                 signInWithFacebookButton,
-                v -> facebookLoginButton.performClick(),
+                v -> {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (user != null && user.isSignedInWith(Provider.FACEBOOK)) {
+                        onDestroy.add(unlinkProvider(user, facebookLoginButton, Provider.FACEBOOK, R.string.facebook)
+                                .subscribe(() -> {}, RxUtil.ON_ERROR_LOG_V3));
+                    } else {
+                        facebookLoginButton.performClick();
+                    }
+                },
                 auth -> {
-                    boolean isLoggedOut = !auth.isSignedIn();
-                    signInWithFacebookButton.setEnabled(isLoggedOut);
-                    if (isLoggedOut) {
+                    setButtonText(signInWithFacebookButton, Provider.FACEBOOK, R.string.facebook);
+                    if (!auth.isSignedInWith(Provider.FACEBOOK)) {
                         LoginManager.getInstance().logOut();
                     }
                 });
@@ -275,28 +356,35 @@ public class LoginActivity extends BaseActivity {
     private void setupSignInWithGoogleButton(FirebaseAuth firebaseAuth) {
         setupButton(firebaseAuth,
                 signInWithGoogleButton,
-                v -> onDestroy.add(RxJavaBridge
-                        .toV3Disposable(new RxInlineActivityResult(this)
-                                .request(googleSignInClient.getSignInIntent())
-                                .map(result -> {
-                                    Intent data = result.getData();
-                                    return GoogleSignIn.getSignedInAccountFromIntent(data)
-                                            .getResult();
-                                })
-                                .flatMapSingle(account -> {
-                                    String token = account.getIdToken();
-                                    IdpAuthCredential credential = GoogleAuthProvider.getCredential(token);
-                                    return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
-                                })
-                                .doOnError(e -> {
-                                    dialog(e);
-                                    googleSignInClient.signOut();
-                                })
-                                .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2))),
+                v -> {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (user != null && user.isSignedInWith(Provider.GOOGLE)) {
+                        onDestroy.add(unlinkProvider(user, signInWithGoogleButton, Provider.GOOGLE, R.string.google)
+                                .subscribe(() -> {}, RxUtil.ON_ERROR_LOG_V3));
+                    } else {
+                        onDestroy.add(RxJavaBridge
+                                .toV3Disposable(new RxInlineActivityResult(this)
+                                        .request(googleSignInClient.getSignInIntent())
+                                        .map(result -> {
+                                            Intent data = result.getData();
+                                            return GoogleSignIn.getSignedInAccountFromIntent(data)
+                                                    .getResult();
+                                        })
+                                        .flatMapSingle(account -> {
+                                            String token = account.getIdToken();
+                                            IdpAuthCredential credential = GoogleAuthProvider.getCredential(token);
+                                            return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
+                                        })
+                                        .doOnError(e -> {
+                                            dialog(e);
+                                            googleSignInClient.signOut();
+                                        })
+                                        .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2)));
+                    }
+                },
                 auth -> {
-                    boolean isLoggedOut = !auth.isSignedIn();
-                    signInWithGoogleButton.setEnabled(isLoggedOut);
-                    if (isLoggedOut) {
+                    setButtonText(signInWithGoogleButton, Provider.GOOGLE, R.string.google);
+                    if (!auth.isSignedInWith(Provider.GOOGLE)) {
                         googleSignInClient.signOut();
                     }
                 });
@@ -322,6 +410,19 @@ public class LoginActivity extends BaseActivity {
                 .subscribe(authStateConsumer, RxUtil.ON_ERROR_LOG_V3));
     }
 
+    private void setButtonText(@NonNull Button button, @NonNull Provider provider, @StringRes int providerName) {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        String name = getString(providerName);
+        if (user != null) {
+            boolean linked = user.isSignedInWith(provider);
+            int text = linked ? R.string.unlink_from_x : R.string.link_with_x;
+            button.setText(getString(text, name));
+        } else {
+            button.setText(getString(R.string.sign_in_with_x, name));
+        }
+        button.setEnabled(true);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_login, menu);
@@ -333,6 +434,12 @@ public class LoginActivity extends BaseActivity {
         final int itemId = item.getItemId();
         if (R.id.action_edit_profile == itemId) {
             startProfileEditing();
+            return true;
+        } else if (R.id.action_change_email == itemId) {
+            startEmailChange();
+            return true;
+        } else if (R.id.action_verify_email == itemId) {
+            startVerifyEmail();
             return true;
         } else if (R.id.action_change_password == itemId) {
             startPasswordChange();

@@ -5,13 +5,18 @@ import com.anotherdev.firebase.auth.UserProfileChangeRequest;
 import com.anotherdev.firebase.auth.UserProfileChangeResponse;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoRequest;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoResponse;
+import com.anotherdev.firebase.auth.rest.api.model.SendEmailVerificationRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SendEmailVerificationResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
 import com.anotherdev.firebase.auth.rest.api.model.SignInRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithCustomTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
+import com.anotherdev.firebase.auth.rest.api.model.UnlinkProviderRequest;
+import com.anotherdev.firebase.auth.rest.api.model.UserEmailChangeRequest;
 import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
+import com.google.gson.JsonObject;
 
 import io.reactivex.rxjava3.core.Single;
 import retrofit2.http.Body;
@@ -41,6 +46,9 @@ public interface IdentityToolkitApi {
     @POST("v1/accounts:sendOobCode")
     Single<SendPasswordResetEmailResponse> sendPasswordResetEmail(@Body SendPasswordResetEmailRequest request);
 
+    @POST("v1/accounts:sendOobCode")
+    Single<SendEmailVerificationResponse> sendEmailVerification(@Body SendEmailVerificationRequest request);
+
     @POST("v1/accounts:lookup")
     Single<GetAccountInfoResponse> getAccounts(@Body GetAccountInfoRequest request);
 
@@ -48,5 +56,11 @@ public interface IdentityToolkitApi {
     Single<UserProfileChangeResponse> updateProfile(@Body UserProfileChangeRequest request);
 
     @POST("v1/accounts:update")
+    Single<SignInResponse> updateEmail(@Body UserEmailChangeRequest request);
+
+    @POST("v1/accounts:update")
     Single<SignInResponse> updatePassword(@Body UserPasswordChangeRequest request);
+
+    @POST("v1/accounts:update")
+    Single<JsonObject> unlink(@Body UnlinkProviderRequest request);
 }

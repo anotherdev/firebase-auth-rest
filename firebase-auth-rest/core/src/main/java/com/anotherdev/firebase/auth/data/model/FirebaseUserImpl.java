@@ -16,8 +16,12 @@ import com.anotherdev.firebase.auth.data.Data;
 import com.anotherdev.firebase.auth.provider.AuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.rest.RestAuthProvider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
+import com.anotherdev.firebase.auth.rest.api.model.SendEmailVerificationRequest;
+import com.anotherdev.firebase.auth.rest.api.model.SendEmailVerificationResponse;
+import com.anotherdev.firebase.auth.rest.api.model.UserEmailChangeRequest;
 import com.anotherdev.firebase.auth.rest.api.model.UserPasswordChangeRequest;
 import com.anotherdev.firebase.auth.util.FarGson;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
@@ -43,9 +47,8 @@ public class FirebaseUserImpl implements FirebaseUser {
     @NonNull
     JsonObject userInfo;
 
-    @SuppressWarnings("NullableProblems")
     @NonNull
-    FirebaseAuthData firebaseAuthData;
+    FirebaseAuthData firebaseAuthData = new FirebaseAuthData();
 
     @Nullable
     transient FirebaseAuth auth;
@@ -54,7 +57,6 @@ public class FirebaseUserImpl implements FirebaseUser {
 
     FirebaseUserImpl() {
         userInfo = new JsonObject();
-        firebaseAuthData = new FirebaseAuthData();
     }
 
     FirebaseUserImpl(@Nullable String appName, @Nullable String idToken, @Nullable String refreshToken) {
@@ -147,6 +149,14 @@ public class FirebaseUserImpl implements FirebaseUser {
         return getAsString(userInfo, "email");
     }
 
+    @Override
+    public boolean isEmailVerified() {
+        String uid = getUid();
+        return getData().getUserProfile(uid != null ? uid : "")
+                .get()
+                .isEmailVerified();
+    }
+
     @NonNull
     @Override
     public List<UserInfo> getProviderData() {
@@ -161,6 +171,17 @@ public class FirebaseUserImpl implements FirebaseUser {
         return firebaseAuthData.getIdentities().isEmpty();
     }
 
+    @Override
+    public boolean isSignedInWith(@NonNull Provider provider) {
+        String lookingForProviderId = provider.getProviderId();
+        for (UserInfo info : getProviderData()) {
+            if (info != null && lookingForProviderId.equals(info.getProviderId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @NonNull
     @Override
     public Single<SignInResponse> linkWithCredential(@NonNull AuthCredential credential) {
@@ -172,6 +193,12 @@ public class FirebaseUserImpl implements FirebaseUser {
             String error = String.format("AuthCredential: %s not supported yet.", credentialClassName);
             return Single.error(new UnsupportedOperationException(error));
         }
+    }
+
+    @NonNull
+    @Override
+    public Completable unlink(@NonNull String provider) {
+        return getAuth().unlink(this, provider);
     }
 
     @NonNull
@@ -193,14 +220,7 @@ public class FirebaseUserImpl implements FirebaseUser {
     @NonNull
     @Override
     public Completable reload() {
-        return Completable.fromAction(() -> {
-            if (idToken != null) {
-                getAuthInternal().getAccountInfo(idToken);
-            } else {
-                String error = String.format("idToken is null. Cannot reload user: %s", getUid());
-                throw new IllegalStateException(error);
-            }
-        });
+        return Completable.fromAction(() -> getAuthInternal().getAccountInfo());
     }
 
     @NonNull
@@ -209,8 +229,21 @@ public class FirebaseUserImpl implements FirebaseUser {
         return Single.just(ImmutableUserProfileChangeRequest.copyOf(request))
                 .map(req -> req.withIdToken(idToken))
                 .flatMap(req -> RestAuthApi.auth().updateProfile(req))
-                .doOnSuccess(response -> getAuthInternal().getAccessToken(true))
-                .flatMapCompletable(ignored -> Completable.complete());
+                .flatMap(response -> getAuthInternal().exchangeToken())
+                .flatMapCompletable(ignored -> reload());
+    }
+
+    @NonNull
+    @Override
+    public Completable updateEmail(@NonNull String newEmail) {
+        return Single.just(newEmail)
+                .map(email -> UserEmailChangeRequest.builder()
+                        .idToken(idToken)
+                        .email(email)
+                        .build())
+                .flatMap(req -> RestAuthApi.auth().updateEmail(req))
+                .map(response -> getAuthInternal().saveCurrentUser(response))
+                .flatMapCompletable(response -> reload());
     }
 
     @NonNull
@@ -224,6 +257,17 @@ public class FirebaseUserImpl implements FirebaseUser {
                 .flatMap(req -> RestAuthApi.auth().updatePassword(req))
                 .doOnSuccess(response -> getAuthInternal().saveCurrentUser(response))
                 .flatMapCompletable(ignored -> Completable.complete());
+    }
+
+    @NonNull
+    @Override
+    public Single<SendEmailVerificationResponse> sendEmailVerification() {
+        return Single.defer(() -> {
+            SendEmailVerificationRequest request = SendEmailVerificationRequest.builder()
+                    .idToken(idToken)
+                    .build();
+            return RestAuthApi.auth().sendEmailVerification(request);
+        });
     }
 
     public long getExpirationTime() {

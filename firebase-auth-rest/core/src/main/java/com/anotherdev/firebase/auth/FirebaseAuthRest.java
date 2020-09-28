@@ -15,6 +15,10 @@ public class FirebaseAuthRest {
             Collections.unmodifiableCollection(TOKEN_REFRESHER_MAP.values());
 
 
+    public static FirebaseAuth getInstance() {
+        return getInstance(FirebaseApp.getInstance());
+    }
+
     public static FirebaseAuth getInstance(FirebaseApp app) {
         final String name = app.getName();
         RestAuthTokenRefresher tokenRefresher = TOKEN_REFRESHER_MAP.get(name);

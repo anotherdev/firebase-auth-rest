@@ -5,11 +5,13 @@ import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SendPasswordResetEmailResponse;
 import com.google.firebase.FirebaseApp;
 
 import io.reactivex.rxjava3.annotations.CheckReturnValue;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
@@ -27,6 +29,8 @@ public interface FirebaseAuth {
     Observable<FirebaseUser> currentUser();
 
     boolean isSignedIn();
+
+    boolean isSignedInWith(Provider provider);
 
     @NonNull
     @CheckReturnValue
@@ -63,6 +67,10 @@ public interface FirebaseAuth {
     @NonNull
     @CheckReturnValue
     Single<SignInResponse> linkWithCredential(@NonNull FirebaseUser user, @NonNull IdpAuthCredential credential);
+
+    @NonNull
+    @CheckReturnValue
+    Completable unlink(@NonNull FirebaseUser user, @NonNull String provider);
 
     @NonNull
     @CheckReturnValue

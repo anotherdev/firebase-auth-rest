@@ -10,6 +10,18 @@
         app:showAsAction="ifRoom"/>
 
     <item
+        android:id="@+id/action_change_email"
+        android:icon="@drawable/ic_email_white_48dp"
+        android:title="@string/change_email"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_verify_email"
+        android:icon="@drawable/ic_email_read_white_48dp"
+        android:title="@string/verify_email"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_change_password"
         android:icon="@drawable/ic_vpn_key_white_24dp"
         android:title="@string/change_password"

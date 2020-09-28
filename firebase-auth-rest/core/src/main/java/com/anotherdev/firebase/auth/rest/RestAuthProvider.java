@@ -5,6 +5,8 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
+import androidx.core.util.ObjectsCompat;
 
 import com.anotherdev.firebase.auth.FirebaseAuth;
 import com.anotherdev.firebase.auth.FirebaseUser;
@@ -16,8 +18,10 @@ import com.anotherdev.firebase.auth.internal.CustomFirebaseExceptions;
 import com.anotherdev.firebase.auth.provider.EmailAuthCredential;
 import com.anotherdev.firebase.auth.provider.EmailAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
 import com.anotherdev.firebase.auth.rest.api.RestAuthApi;
 import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenRequest;
+import com.anotherdev.firebase.auth.rest.api.model.ExchangeTokenResponse;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoRequest;
 import com.anotherdev.firebase.auth.rest.api.model.GetAccountInfoResponse;
 import com.anotherdev.firebase.auth.rest.api.model.ImmutableSignInWithEmailPasswordRequest;
@@ -28,6 +32,7 @@ import com.anotherdev.firebase.auth.rest.api.model.SignInAnonymouslyRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithCustomTokenRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithEmailPasswordRequest;
 import com.anotherdev.firebase.auth.rest.api.model.SignInWithIdpRequest;
+import com.anotherdev.firebase.auth.rest.api.model.UnlinkProviderRequest;
 import com.anotherdev.firebase.auth.util.IdTokenParser;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.anotherdev.firebase.auth.util.Strings;
@@ -47,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.internal.functions.Functions;
@@ -101,6 +107,11 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
     @Override
     public boolean isSignedIn() {
         return userStore.isSet();
+    }
+
+    @Override
+    public boolean isSignedInWith(Provider provider) {
+        return isSignedIn() && userStore.get().isSignedInWith(provider);
     }
 
     @NonNull
@@ -223,6 +234,18 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
 
     @NonNull
     @Override
+    public Completable unlink(@NonNull FirebaseUser user, @NonNull String provider) {
+        UnlinkProviderRequest request = UnlinkProviderRequest.builder()
+                .idToken(user.getIdToken())
+                .addProviders(provider)
+                .build();
+        return RestAuthApi.auth()
+                .unlink(request)
+                .flatMapCompletable(jsonObject -> Completable.complete());
+    }
+
+    @NonNull
+    @Override
     public Single<SendPasswordResetEmailResponse> sendPasswordResetEmail(SendPasswordResetEmailRequest request) {
         return RestAuthApi.auth().sendPasswordResetEmail(request);
     }
@@ -253,17 +276,8 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 source.trySetException(new FirebaseException("Current refresh token is null. Log out"));
                 signOut();
             } else {
-                ExchangeTokenRequest request = ExchangeTokenRequest.builder()
-                        .refreshToken(currentRefreshToken)
-                        .build();
-
                 //noinspection ResultOfMethodCallIgnored
-                RestAuthApi.token()
-                        .exchangeToken(request)
-                        .map(response -> {
-                            saveCurrentUser(response.getIdToken(), response.getRefreshToken());
-                            return response;
-                        })
+                exchangeToken(user)
                         .doOnSuccess(response -> source.trySetResult(getTokenResultLocal(user)))
                         .doOnError(e -> source.trySetException(new Exception(e)))
                         .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
@@ -272,6 +286,21 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
             source.trySetException(new FirebaseNoSignedInUserException("Please sign in before trying to get a token."));
         }
         return source.getTask();
+    }
+
+    public Single<ExchangeTokenResponse> exchangeToken() {
+        return exchangeToken(userStore.get());
+    }
+
+    public Single<ExchangeTokenResponse> exchangeToken(@NonNull FirebaseUserImpl user) {
+        return Single.fromCallable(user::getRefreshToken)
+                .map(token -> ExchangeTokenRequest.builder().refreshToken(token).build())
+                .flatMap(request -> RestAuthApi.token().exchangeToken(request))
+                .doOnError(e -> Timber.tag("http").e(e))
+                .map(response -> {
+                    saveCurrentUser(response.getIdToken(), response.getRefreshToken());
+                    return response;
+                });
     }
 
     @Nullable
@@ -306,11 +335,17 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
         userStore.set(user);
     }
 
+    @WorkerThread
     private SignInResponse getAccountInfo(SignInResponse signInResponse) {
         getAccountInfo(signInResponse.getIdToken());
         return signInResponse;
     }
 
+    public void getAccountInfo() {
+        getAccountInfo(userStore.get().getIdToken());
+    }
+
+    @WorkerThread
     public void getAccountInfo(@NonNull String idToken) {
         GetAccountInfoRequest request = GetAccountInfoRequest.builder()
                 .idToken(idToken)
@@ -319,10 +354,22 @@ public class RestAuthProvider implements FirebaseAuth, InternalAuthProvider {
                 .getAccounts(request)
                 .blockingGet();
 
+        final String currentUserId = userStore.get().getUid();
+
         Data dataStore = Data.from(app.getApplicationContext());
         for (UserProfile profile : accountInfo.getUsers()) {
             final String uid = profile.getLocalId();
             dataStore.getUserProfile(uid).set(profile);
+
+            if (ObjectsCompat.equals(uid, currentUserId)) {
+                try {
+                    FirebaseUserImpl user = userStore.get();
+                    user.getUserInfo().addProperty("far_updatedAt", System.currentTimeMillis());
+                    userStore.set(user);
+                } catch (Exception e) {
+                    Timber.e(e);
+                }
+            }
         }
     }
 }

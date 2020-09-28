@@ -5,14 +5,19 @@
     <string name="password">Password</string>
     <string name="register">Register</string>
 
+    <string name="sign_in_with_x">Sign in with %s</string>
+    <string name="link_with_x">Link with %s</string>
+    <string name="unlink_from_x">Unlink from %s</string>
     <string name="sign_in_anonymously">Sign In Anonymously</string>
     <string name="register_email_password">Register Email/Password</string>
-    <string name="sign_in__with_email">Sign In With Email</string>
-    <string name="sign_in__with_facebook">Sign In With Facebook</string>
-    <string name="sign_in__with_google">Sign In With Google</string>
+    <string name="sign_in_with_email">Sign In With Email</string>
+    <string name="facebook">Facebook</string>
+    <string name="google">Google</string>
     <string name="log_out">Log Out</string>
 
     <string name="edit_profile">Edit Profile</string>
+    <string name="change_email">Change Email</string>
+    <string name="verify_email">Verify Email</string>
     <string name="change_password">Change Password</string>
     <string name="current_password">Current Password</string>
     <string name="new_password">New Password</string>

@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.anotherdev.firebase.auth.provider.AuthCredential;
+import com.anotherdev.firebase.auth.provider.Provider;
+import com.anotherdev.firebase.auth.rest.api.model.SendEmailVerificationResponse;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -31,14 +33,22 @@ public interface FirebaseUser {
     @Nullable
     String getEmail();
 
+    boolean isEmailVerified();
+
     @NonNull
     List<UserInfo> getProviderData();
 
     boolean isAnonymous();
 
+    boolean isSignedInWith(@NonNull Provider provider);
+
     @NonNull
     @CheckReturnValue
     Single<SignInResponse> linkWithCredential(@NonNull AuthCredential credential);
+
+    @NonNull
+    @CheckReturnValue
+    Completable unlink(@NonNull String provider);
 
     @NonNull
     @CheckReturnValue
@@ -54,5 +64,13 @@ public interface FirebaseUser {
 
     @NonNull
     @CheckReturnValue
+    Completable updateEmail(@NonNull String newEmail);
+
+    @NonNull
+    @CheckReturnValue
     Completable updatePassword(@NonNull String newPassword);
+
+    @NonNull
+    @CheckReturnValue
+    Single<SendEmailVerificationResponse> sendEmailVerification();
 }
