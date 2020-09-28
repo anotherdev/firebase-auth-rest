@@ -250,6 +250,13 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
+    private Completable unlinkProvider(@NonNull FirebaseUser user, @NonNull Button button, @NonNull Provider provider, @StringRes int providerName) {
+        return user.unlink(provider.getProviderId())
+                .andThen(user.reload())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete(() -> setButtonText(button, provider, providerName));
+    }
+
     private void setupSignInAnonymouslyButton(FirebaseAuth firebaseAuth) {
         setupButton(firebaseAuth,
                 signInAnonymouslyButton,
@@ -332,11 +339,7 @@ public class LoginActivity extends BaseActivity {
                 v -> {
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     if (user != null && user.isSignedInWith(Provider.FACEBOOK)) {
-                        onDestroy.add(user
-                                .unlink(Provider.FACEBOOK.getProviderId())
-                                .andThen(user.reload())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .doOnComplete(() -> setButtonText(signInWithFacebookButton, Provider.FACEBOOK, R.string.facebook))
+                        onDestroy.add(unlinkProvider(user, facebookLoginButton, Provider.FACEBOOK, R.string.facebook)
                                 .subscribe(() -> {}, RxUtil.ON_ERROR_LOG_V3));
                     } else {
                         facebookLoginButton.performClick();
@@ -353,28 +356,35 @@ public class LoginActivity extends BaseActivity {
     private void setupSignInWithGoogleButton(FirebaseAuth firebaseAuth) {
         setupButton(firebaseAuth,
                 signInWithGoogleButton,
-                v -> onDestroy.add(RxJavaBridge
-                        .toV3Disposable(new RxInlineActivityResult(this)
-                                .request(googleSignInClient.getSignInIntent())
-                                .map(result -> {
-                                    Intent data = result.getData();
-                                    return GoogleSignIn.getSignedInAccountFromIntent(data)
-                                            .getResult();
-                                })
-                                .flatMapSingle(account -> {
-                                    String token = account.getIdToken();
-                                    IdpAuthCredential credential = GoogleAuthProvider.getCredential(token);
-                                    return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
-                                })
-                                .doOnError(e -> {
-                                    dialog(e);
-                                    googleSignInClient.signOut();
-                                })
-                                .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2))),
+                v -> {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (user != null && user.isSignedInWith(Provider.GOOGLE)) {
+                        onDestroy.add(unlinkProvider(user, signInWithGoogleButton, Provider.GOOGLE, R.string.google)
+                                .subscribe(() -> {}, RxUtil.ON_ERROR_LOG_V3));
+                    } else {
+                        onDestroy.add(RxJavaBridge
+                                .toV3Disposable(new RxInlineActivityResult(this)
+                                        .request(googleSignInClient.getSignInIntent())
+                                        .map(result -> {
+                                            Intent data = result.getData();
+                                            return GoogleSignIn.getSignedInAccountFromIntent(data)
+                                                    .getResult();
+                                        })
+                                        .flatMapSingle(account -> {
+                                            String token = account.getIdToken();
+                                            IdpAuthCredential credential = GoogleAuthProvider.getCredential(token);
+                                            return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
+                                        })
+                                        .doOnError(e -> {
+                                            dialog(e);
+                                            googleSignInClient.signOut();
+                                        })
+                                        .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2)));
+                    }
+                },
                 auth -> {
-                    boolean isLoggedOut = !auth.isSignedIn();
                     setButtonText(signInWithGoogleButton, Provider.GOOGLE, R.string.google);
-                    if (isLoggedOut) {
+                    if (!auth.isSignedInWith(Provider.GOOGLE)) {
                         googleSignInClient.signOut();
                     }
                 });
