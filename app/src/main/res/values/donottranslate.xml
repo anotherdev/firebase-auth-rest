@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string name="auth_google_scheme">https</string>
+    <string name="auth_google_host">idp.anotherdev.com</string>
+    <string name="auth_google_path">"/auth/handler/huawei-dtse"</string>
+
+</resources>
