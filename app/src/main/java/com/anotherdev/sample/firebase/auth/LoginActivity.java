@@ -29,7 +29,6 @@ import com.anotherdev.firebase.auth.provider.FacebookAuthProvider;
 import com.anotherdev.firebase.auth.provider.GoogleAuthProvider;
 import com.anotherdev.firebase.auth.provider.IdpAuthCredential;
 import com.anotherdev.firebase.auth.provider.Provider;
-import com.anotherdev.firebase.auth.util.FarGson;
 import com.anotherdev.firebase.auth.util.RxUtil;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -39,8 +38,11 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.FirebaseApp;
 import com.yarolegovich.lovelydialog.LovelyTextInputDialog;
 
@@ -371,6 +373,14 @@ public class LoginActivity extends BaseActivity {
                 });
     }
 
+    private Observable<String> getGoogleIdTokenBySdk() {
+        return new RxInlineActivityResult(this)
+                .request(googleSignInClient.getSignInIntent())
+                .map(result -> GoogleSignIn.getSignedInAccountFromIntent(result.getData()).getResult())
+                .map(GoogleSignInAccount::getIdToken)
+                .as(RxJavaBridge.toV3Observable());
+    }
+
     private Observable<String> getGoogleIdTokenByChromeCustomTab() {
         AuthorizationServiceConfiguration asc = new AuthorizationServiceConfiguration(
                 Uri.parse("https://accounts.google.com/o/oauth2/v2/auth"),
@@ -398,7 +408,7 @@ public class LoginActivity extends BaseActivity {
                 .map(AuthorizationResponse::fromIntent)
                 .flatMap(authResponse -> io.reactivex.Observable.<String>create(emitter -> service.performTokenRequest(
                         authResponse.createTokenExchangeRequest(),
-                        new ClientSecretBasic(BuildConfig.GOOGLE_CLIENT_SECRET + "wtf"),
+                        new ClientSecretBasic(BuildConfig.GOOGLE_CLIENT_SECRET),
                         (tokenResponse, e) -> {
                             if (tokenResponse != null) {
                                 emitter.onNext(tokenResponse.idToken);
@@ -413,43 +423,27 @@ public class LoginActivity extends BaseActivity {
         setupButton(firebaseAuth,
                 signInWithGoogleButton,
                 v -> {
-                    if (true) {
-                        onDestroy.add(getGoogleIdTokenByChromeCustomTab()
-                                .doOnNext(tokenResponse -> Log.d("http", "tokenResponse: " + FarGson.get().toJson(tokenResponse)))
-                                .flatMapSingle(idToken -> firebaseAuth.signInWithCredential(GoogleAuthProvider.getCredential(idToken)))
-                                .doOnNext(signInResponse -> Log.d("http", "signInResponse: " + FarGson.get().toJson(signInResponse)))
-                                .doOnError(e -> Log.e("http", "error: " + e, e))
-                                .doOnError(e -> {
-                                    dialog(e);
-                                    googleSignInClient.signOut();
-                                })
-                                .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
-                        return;
-                    }
-
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     if (user != null && user.isSignedInWith(Provider.GOOGLE)) {
                         onDestroy.add(unlinkProvider(user, signInWithGoogleButton, Provider.GOOGLE, R.string.google)
                                 .subscribe(() -> {}, RxUtil.ON_ERROR_LOG_V3));
                     } else {
-                        onDestroy.add(RxJavaBridge
-                                .toV3Disposable(new RxInlineActivityResult(this)
-                                        .request(googleSignInClient.getSignInIntent())
-                                        .map(result -> {
-                                            Intent data = result.getData();
-                                            return GoogleSignIn.getSignedInAccountFromIntent(data)
-                                                    .getResult();
-                                        })
-                                        .flatMapSingle(account -> {
-                                            String token = account.getIdToken();
-                                            IdpAuthCredential credential = GoogleAuthProvider.getCredential(token);
-                                            return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
-                                        })
-                                        .doOnError(e -> {
-                                            dialog(e);
-                                            googleSignInClient.signOut();
-                                        })
-                                        .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2)));
+                        final boolean hasGms = ConnectionResult.SUCCESS == GoogleApiAvailability.getInstance()
+                                .isGooglePlayServicesAvailable(this);
+                        Observable<String> getGoogleIdToken = hasGms
+                                ? getGoogleIdTokenBySdk()
+                                : getGoogleIdTokenByChromeCustomTab();
+                        //noinspection ResultOfMethodCallIgnored
+                        getGoogleIdToken.doOnSubscribe(onDestroy::add)
+                                .flatMapSingle(token -> {
+                                    IdpAuthCredential credential = GoogleAuthProvider.getCredential(token);
+                                    return firebaseAuth.signInWithCredential(credential);
+                                })
+                                .doOnError(e -> {
+                                    dialog(e);
+                                    googleSignInClient.signOut();
+                                })
+                                .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
                     }
                 },
                 auth -> {
