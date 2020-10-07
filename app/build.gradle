@@ -5,6 +5,17 @@ android {
     def APP_NAME = "AuthRest"
     def APP_TITLE = "Firebase Auth REST API"
 
+    Properties properties = new Properties()
+    def propertiesFile = file('../local.properties')
+    if (propertiesFile.canRead()) {
+        properties.load(new FileInputStream(propertiesFile))
+        def KEYSTORE_FILE_KEY = "keystore.file"
+        if (properties.containsKey(KEYSTORE_FILE_KEY)) {
+            // Override debug keystore if one specified
+            android.signingConfigs.debug.storeFile = file(properties[KEYSTORE_FILE_KEY])
+        }
+    }
+
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
@@ -13,6 +24,12 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.fullVersionCode
         versionName rootProject.ext.versionName
+
+        def GOOGLE_CLIENT_SECRET = "google.client.secret"
+        if (!properties.containsKey(GOOGLE_CLIENT_SECRET)) {
+            project.logger.log(LogLevel.ERROR, String.format("Can't find property: \"%s\" in the local.properties file", GOOGLE_CLIENT_SECRET))
+        }
+        buildConfigField("String", "GOOGLE_CLIENT_SECRET", properties[GOOGLE_CLIENT_SECRET])
 
         resValue "string", "app_name", APP_NAME
         resValue "string", "app_title", APP_TITLE
@@ -28,14 +45,6 @@ android {
         }
     }
 
-    Properties properties = new Properties()
-    def propertiesFile = file('../local.properties')
-    if (propertiesFile.canRead()) {
-        properties.load(new FileInputStream(propertiesFile))
-        if (properties != null && properties.containsKey('keystore.file')) {
-            android.signingConfigs.debug.storeFile = file(properties['keystore.file'])
-        }
-    }
     project.logger.lifecycle('android.signingConfigs.debug.storeFile: ' + android.signingConfigs.debug.storeFile)
 
     buildTypes {
