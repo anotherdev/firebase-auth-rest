@@ -50,13 +50,12 @@ import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
 import net.openid.appauth.ClientSecretBasic;
 import net.openid.appauth.ResponseTypeValues;
-import net.openid.appauth.TokenResponse;
 
 import butterknife.BindView;
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
-import io.reactivex.Observable;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.internal.functions.Functions;
@@ -372,54 +371,59 @@ public class LoginActivity extends BaseActivity {
                 });
     }
 
+    private Observable<String> getGoogleIdTokenByChromeCustomTab() {
+        AuthorizationServiceConfiguration asc = new AuthorizationServiceConfiguration(
+                Uri.parse("https://accounts.google.com/o/oauth2/v2/auth"),
+                Uri.parse("https://www.googleapis.com/oauth2/v4/token")
+        );
+
+        String clientId = getString(R.string.default_web_client_id);
+        Uri redirectUri = new Uri.Builder()
+                .scheme(getString(R.string.auth_google_scheme))
+                .authority(getString(R.string.auth_google_host))
+                .path(getString(R.string.auth_google_path))
+                .build();
+        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(asc, clientId, ResponseTypeValues.CODE, redirectUri)
+                .setScopes("profile email")
+                .setPrompt(AuthorizationRequest.Prompt.LOGIN);
+
+        AuthorizationService service = getAppAuthService();
+        return new RxInlineActivityResult(this)
+                .request(service.getAuthorizationRequestIntent(builder.build()))
+                .flatMap(result -> {
+                    Intent data = result.getData();
+                    Throwable cause = result.getCause();
+                    return data != null ? io.reactivex.Observable.just(data) : io.reactivex.Observable.error(cause != null ? cause : new UnknownError());
+                })
+                .map(AuthorizationResponse::fromIntent)
+                .flatMap(authResponse -> io.reactivex.Observable.<String>create(emitter -> service.performTokenRequest(
+                        authResponse.createTokenExchangeRequest(),
+                        new ClientSecretBasic(BuildConfig.GOOGLE_CLIENT_SECRET + "wtf"),
+                        (tokenResponse, e) -> {
+                            if (tokenResponse != null) {
+                                emitter.onNext(tokenResponse.idToken);
+                            } else {
+                                emitter.onError(e);
+                            }
+                        })))
+                .as(RxJavaBridge.toV3Observable());
+    }
+
     private void setupSignInWithGoogleButton(FirebaseAuth firebaseAuth) {
         setupButton(firebaseAuth,
                 signInWithGoogleButton,
                 v -> {
                     if (true) {
-                        AuthorizationServiceConfiguration asc = new AuthorizationServiceConfiguration(
-                                Uri.parse("https://accounts.google.com/o/oauth2/v2/auth"),
-                                Uri.parse("https://www.googleapis.com/oauth2/v4/token")
-                        );
-
-                        String clientId = getString(R.string.default_web_client_id);
-                        Uri redirectUri = new Uri.Builder()
-                                .scheme(getString(R.string.auth_google_scheme))
-                                .authority(getString(R.string.auth_google_host))
-                                .path(getString(R.string.auth_google_path))
-                                .build();
-                        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(asc, clientId, ResponseTypeValues.CODE, redirectUri)
-                                .setScopes("profile email")
-                                .setPrompt(AuthorizationRequest.Prompt.LOGIN);
-
-                        AuthorizationService service = getAppAuthService();
-                        Intent authIntent = service.getAuthorizationRequestIntent(builder.build());
-
-                        onDestroy.add(RxJavaBridge.toV3Disposable(new RxInlineActivityResult(this)
-                                .request(authIntent)
-                                .flatMap(result -> {
-                                    Intent data = result.getData();
-                                    Throwable cause = result.getCause();
-                                    return data != null ? Observable.just(data) : Observable.error(cause != null ? cause : new UnknownError());
-                                })
-                                .map(AuthorizationResponse::fromIntent)
-                                .flatMap(authResponse -> Observable.<TokenResponse>create(emitter -> service.performTokenRequest(
-                                        authResponse.createTokenExchangeRequest(),
-                                        new ClientSecretBasic(BuildConfig.GOOGLE_CLIENT_SECRET),
-                                        (tokenResponse, e) -> {
-                                            if (tokenResponse != null) {
-                                                emitter.onNext(tokenResponse);
-                                            } else {
-                                                emitter.onError(e);
-                                            }
-                                        })))
+                        onDestroy.add(getGoogleIdTokenByChromeCustomTab()
                                 .doOnNext(tokenResponse -> Log.d("http", "tokenResponse: " + FarGson.get().toJson(tokenResponse)))
-                                .flatMapSingle(tokenResponse -> RxJavaBridge.toV2Single(
-                                        firebaseAuth.signInWithCredential(
-                                                GoogleAuthProvider.getCredential(tokenResponse.idToken))))
+                                .flatMapSingle(idToken -> firebaseAuth.signInWithCredential(GoogleAuthProvider.getCredential(idToken)))
                                 .doOnNext(signInResponse -> Log.d("http", "signInResponse: " + FarGson.get().toJson(signInResponse)))
                                 .doOnError(e -> Log.e("http", "error: " + e, e))
-                                .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2)));
+                                .doOnError(e -> {
+                                    dialog(e);
+                                    googleSignInClient.signOut();
+                                })
+                                .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3));
                         return;
                     }
 
