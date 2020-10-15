@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.anotherdev.sample.firebase.auth">
 
     <application
@@ -27,6 +28,19 @@
             android:value="@string/facebook_app_id" />
 
         <activity android:name="com.anotherdev.sample.firebase.auth.MainActivity" />
+
+        <activity
+            android:name="net.openid.appauth.RedirectUriReceiverActivity"
+            tools:node="replace">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="@string/auth_google_scheme"
+                    android:host="@string/auth_google_host"
+                    android:path="@string/auth_google_path" />
+            </intent-filter>
+        </activity>
 
     </application>
 

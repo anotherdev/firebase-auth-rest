@@ -2,6 +2,7 @@ package com.anotherdev.sample.firebase.auth;
 
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -37,15 +38,26 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.github.florent37.inlineactivityresult.rx.RxInlineActivityResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.FirebaseApp;
 import com.yarolegovich.lovelydialog.LovelyTextInputDialog;
+
+import net.openid.appauth.AuthorizationRequest;
+import net.openid.appauth.AuthorizationResponse;
+import net.openid.appauth.AuthorizationService;
+import net.openid.appauth.AuthorizationServiceConfiguration;
+import net.openid.appauth.ClientSecretBasic;
+import net.openid.appauth.ResponseTypeValues;
 
 import butterknife.BindView;
 import hu.akarnokd.rxjava3.bridge.RxJavaBridge;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.internal.functions.Functions;
@@ -66,6 +78,7 @@ public class LoginActivity extends BaseActivity {
 
     private final CallbackManager facebookCallbackManager = CallbackManager.Factory.create();
     private GoogleSignInClient googleSignInClient;
+    private AuthorizationService appAuthService;
 
     private FirebaseAuth firebaseAuth;
 
@@ -73,6 +86,13 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected int getActivityLayoutRes() {
         return R.layout.activity_login;
+    }
+
+    private AuthorizationService getAppAuthService() {
+        if (appAuthService == null) {
+            appAuthService = new AuthorizationService(this);
+        }
+        return appAuthService;
     }
 
     @Override
@@ -353,6 +373,52 @@ public class LoginActivity extends BaseActivity {
                 });
     }
 
+    private Observable<String> getGoogleIdTokenBySdk() {
+        return new RxInlineActivityResult(this)
+                .request(googleSignInClient.getSignInIntent())
+                .map(result -> GoogleSignIn.getSignedInAccountFromIntent(result.getData()).getResult())
+                .map(GoogleSignInAccount::getIdToken)
+                .as(RxJavaBridge.toV3Observable());
+    }
+
+    private Observable<String> getGoogleIdTokenByChromeCustomTab() {
+        AuthorizationServiceConfiguration asc = new AuthorizationServiceConfiguration(
+                Uri.parse("https://accounts.google.com/o/oauth2/v2/auth"),
+                Uri.parse("https://www.googleapis.com/oauth2/v4/token")
+        );
+
+        String clientId = getString(R.string.default_web_client_id);
+        Uri redirectUri = new Uri.Builder()
+                .scheme(getString(R.string.auth_google_scheme))
+                .authority(getString(R.string.auth_google_host))
+                .path(getString(R.string.auth_google_path))
+                .build();
+        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(asc, clientId, ResponseTypeValues.CODE, redirectUri)
+                .setScopes("profile email")
+                .setPrompt(AuthorizationRequest.Prompt.LOGIN);
+
+        AuthorizationService service = getAppAuthService();
+        return new RxInlineActivityResult(this)
+                .request(service.getAuthorizationRequestIntent(builder.build()))
+                .flatMap(result -> {
+                    Intent data = result.getData();
+                    Throwable cause = result.getCause();
+                    return data != null ? io.reactivex.Observable.just(data) : io.reactivex.Observable.error(cause != null ? cause : new UnknownError());
+                })
+                .map(AuthorizationResponse::fromIntent)
+                .flatMap(authResponse -> io.reactivex.Observable.<String>create(emitter -> service.performTokenRequest(
+                        authResponse.createTokenExchangeRequest(),
+                        new ClientSecretBasic(BuildConfig.GOOGLE_CLIENT_SECRET),
+                        (tokenResponse, e) -> {
+                            if (tokenResponse != null) {
+                                emitter.onNext(tokenResponse.idToken);
+                            } else {
+                                emitter.onError(e);
+                            }
+                        })))
+                .as(RxJavaBridge.toV3Observable());
+    }
+
     private void setupSignInWithGoogleButton(FirebaseAuth firebaseAuth) {
         setupButton(firebaseAuth,
                 signInWithGoogleButton,
@@ -362,24 +428,22 @@ public class LoginActivity extends BaseActivity {
                         onDestroy.add(unlinkProvider(user, signInWithGoogleButton, Provider.GOOGLE, R.string.google)
                                 .subscribe(() -> {}, RxUtil.ON_ERROR_LOG_V3));
                     } else {
-                        onDestroy.add(RxJavaBridge
-                                .toV3Disposable(new RxInlineActivityResult(this)
-                                        .request(googleSignInClient.getSignInIntent())
-                                        .map(result -> {
-                                            Intent data = result.getData();
-                                            return GoogleSignIn.getSignedInAccountFromIntent(data)
-                                                    .getResult();
-                                        })
-                                        .flatMapSingle(account -> {
-                                            String token = account.getIdToken();
-                                            IdpAuthCredential credential = GoogleAuthProvider.getCredential(token);
-                                            return RxJavaBridge.toV2Single(firebaseAuth.signInWithCredential(credential));
-                                        })
-                                        .doOnError(e -> {
-                                            dialog(e);
-                                            googleSignInClient.signOut();
-                                        })
-                                        .subscribe(io.reactivex.internal.functions.Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V2)));
+                        final boolean hasGms = ConnectionResult.SUCCESS == GoogleApiAvailability.getInstance()
+                                .isGooglePlayServicesAvailable(this);
+                        Observable<String> getGoogleIdToken = hasGms
+                                ? getGoogleIdTokenBySdk()
+                                : getGoogleIdTokenByChromeCustomTab();
+                        //noinspection ResultOfMethodCallIgnored
+                        getGoogleIdToken.doOnSubscribe(onDestroy::add)
+                                .flatMapSingle(token -> {
+                                    IdpAuthCredential credential = GoogleAuthProvider.getCredential(token);
+                                    return firebaseAuth.signInWithCredential(credential);
+                                })
+                                .doOnError(e -> {
+                                    dialog(e);
+                                    googleSignInClient.signOut();
+                                })
+                                .subscribe(Functions.emptyConsumer(), RxUtil.ON_ERROR_LOG_V3);
                     }
                 },
                 auth -> {
