@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
+static def wrapString(aString) {
+    return '"' + aString + '"'
+}
+
+static def wrapBoolean(value) {
+    return "Boolean.parseBoolean(" + wrapString(value) + ")"
+}
+
 android {
     def APP_NAME = "AuthRest"
     def APP_TITLE = "Firebase Auth REST API"
@@ -26,10 +34,15 @@ android {
         versionName rootProject.ext.versionName
 
         def GOOGLE_CLIENT_SECRET = "google.client.secret"
-        if (!properties.containsKey(GOOGLE_CLIENT_SECRET)) {
-            project.logger.log(LogLevel.ERROR, String.format("Can't find property: \"%s\" in the local.properties file", GOOGLE_CLIENT_SECRET))
+        def googleClientSecret
+        if (properties.containsKey(GOOGLE_CLIENT_SECRET)) {
+            googleClientSecret = properties[GOOGLE_CLIENT_SECRET]
+        } else {
+            def errorMsg = String.format("Can't find property: '%s' in the local.properties file", GOOGLE_CLIENT_SECRET)
+            project.logger.log(LogLevel.ERROR, errorMsg)
+            googleClientSecret = wrapString(errorMsg)
         }
-        buildConfigField("String", "GOOGLE_CLIENT_SECRET", properties[GOOGLE_CLIENT_SECRET])
+        buildConfigField("String", "GOOGLE_CLIENT_SECRET", googleClientSecret)
 
         resValue "string", "app_name", APP_NAME
         resValue "string", "app_title", APP_TITLE
