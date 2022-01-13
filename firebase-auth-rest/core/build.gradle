@@ -32,6 +32,7 @@ android {
     def GIT_SHA = "GIT_SHA"
     def GIT_COMMIT_HASH = "GIT_COMMIT_HASH"
     def GIT_BRANCH = "GIT_BRANCH"
+    def VERSION_NAME = "VERSION_NAME"
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
@@ -39,11 +40,12 @@ android {
         buildConfigField 'String', GIT_SHA, wrapString(gitSha())
         buildConfigField 'String', GIT_COMMIT_HASH, wrapString(gitCommitHash())
         buildConfigField 'String', GIT_BRANCH, wrapString(gitBranch())
+        buildConfigField 'String', VERSION_NAME, wrapString(rootProject.ext.versionName)
 
         minSdkVersion rootProject.ext.minSdkVersionFirebaseAuthRest
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode rootProject.ext.fullVersionCode
-        versionName rootProject.ext.versionName
+        versionCode rootProject.ext.fullVersionCode // No need for lib module. Delete soon. https://issuetracker.google.com/issues/158695880#comment15
+        versionName rootProject.ext.versionName // No need for lib module. Delete soon. https://issuetracker.google.com/issues/158695880#comment15
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
